@@ -35,8 +35,11 @@ const config = process.env.DATABASE_URL
 const pool = new Pool(config);
 
 async function initDb() {
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
+    console.log('[DB-INIT] Successfully connected to PostgreSQL/Supabase database!');
+    
     // Create the schema to match backend queries
     await client.query('CREATE SCHEMA IF NOT EXISTS health_ai');
 
@@ -123,9 +126,15 @@ async function initDb() {
 
     console.log('PostgreSQL database and tables initialized successfully');
   } catch (err) {
-    console.error('Error initializing PostgreSQL database:', err);
+    console.error('❌ [DB-INIT] Error initializing PostgreSQL database:', err.message);
+    console.error('👉 Troubleshooting Tips:');
+    console.error('   1. Check if your DATABASE_URL in Render is correct and has the correct password (no brackets like []).');
+    console.error('   2. If you are using Supabase, make sure you use the transaction-pooled URL on port 6543 (which is IPv4 compatible).');
+    console.error('   3. Make sure SSL connections are allowed or add ?sslmode=require to your connection string.');
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 }
 
