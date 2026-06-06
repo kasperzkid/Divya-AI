@@ -1251,22 +1251,12 @@ function App() {
     callTimeoutRef.current = setTimeout(() => { setCallStatus('speaking'); speak(greeting); }, 1000);
   };
 
-  function startDiagnosticSession(forceNew = false, selectedMode = null) {
+  function startDiagnosticSession(forceNew = false, selectedMode = 'chat') {
     if (!forceNew && unfinishedSessions.length > 0) {
       setShowUnfinishedModal(true);
       return;
     }
     setShowUnfinishedModal(false);
-
-    if (!selectedMode) {
-      setSessionModeModal({
-        isOpen: true,
-        onSelect: (mode) => {
-          startDiagnosticSession(forceNew, mode);
-        }
-      });
-      return;
-    }
 
     setIsDiagnosticMode(true);
     
@@ -1534,17 +1524,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
     }
   };
 
-  const startRevisionSession = (selectedMode = null) => {
-    if (!selectedMode) {
-      setSessionModeModal({
-        isOpen: true,
-        onSelect: (mode) => {
-          startRevisionSession(mode);
-        }
-      });
-      return;
-    }
-
+  const startRevisionSession = (selectedMode = 'chat') => {
     setIsDiagnosticMode(true);
     
     // Build a custom follow-up prompt based on the previous master report assessment
