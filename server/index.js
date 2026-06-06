@@ -16,6 +16,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Set Cross-Origin-Opener-Policy to allow popups like Google Login to communicate back to our site
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  next();
+});
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 const nodemailer = require('nodemailer');
@@ -134,6 +140,7 @@ app.post('/api/auth/verify-otp', async (req, res) => {
 
 app.post('/api/auth/google', async (req, res) => {
   const { credential, access_token } = req.body;
+  console.log('[AUTH] Received Google login request. Has credential:', !!credential, 'Has access_token:', !!access_token);
   try {
     let email, name, picture;
     if (credential) {
@@ -149,32 +156,61 @@ app.post('/api/auth/google', async (req, res) => {
       const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${access_token}` }
       });
-      if (!response.ok) throw new Error('Failed to fetch user info from Google');
+      if (!response.ok) throw new Error('Failed to fetch user info from Google: status ' + response.status);
       const data = await response.json();
       email = data.email;
       name = data.name;
       picture = data.picture;
     } else {
+      console.warn('[AUTH] Missing credential or access_token in request body');
       return res.status(400).json({ error: 'Missing credential or access_token' });
     }
+
+    console.log('[AUTH] Successfully verified Google token. Email:', email);
     
-    // MySQL: Find or create user
-    const { rows } = await pool.query('SELECT * FROM health_ai.users WHERE email = $1', [email]);
+    // PostgreSQL / Supabase: Find or create user
+    let rows;
+    try {
+      const dbRes = await pool.query('SELECT * FROM health_ai.users WHERE email = $1', [email]);
+      rows = dbRes.rows;
+    } catch (dbError) {
+      console.error('[AUTH] Supabase SELECT query failed:', dbError);
+      return res.status(500).json({ 
+        error: 'Database connection failed. Please check your Supabase/PostgreSQL connection string (DATABASE_URL) on Render.',
+        details: dbError.message 
+      });
+    }
+
     let user;
     if (rows.length === 0) {
       const id = Date.now().toString();
-      await pool.query('INSERT INTO health_ai.users (id, email, name, picture) VALUES ($1, $2, $3, $4)', [id, email, name, picture]);
+      console.log('[AUTH] User not found. Registering new user with ID:', id);
+      try {
+        await pool.query('INSERT INTO health_ai.users (id, email, name, picture) VALUES ($1, $2, $3, $4)', [id, email, name, picture]);
+      } catch (insertError) {
+        console.error('[AUTH] Supabase INSERT query failed:', insertError);
+        return res.status(500).json({ 
+          error: 'Failed to create user in Supabase. Check database schema or connection.',
+          details: insertError.message 
+        });
+      }
       user = { id, email, name, picture };
     } else {
       user = rows[0];
+      console.log('[AUTH] User found. Syncing profile details for email:', email);
       // Update name/picture if changed
-      await pool.query('UPDATE health_ai.users SET name = $1, picture = $2 WHERE email = $3', [name, picture, email]);
+      try {
+        await pool.query('UPDATE health_ai.users SET name = $1, picture = $2 WHERE email = $3', [name, picture, email]);
+      } catch (updateError) {
+        console.error('[AUTH] Supabase UPDATE query failed (non-fatal):', updateError);
+      }
     }
     
     const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
     if (access_token) {
       userGoogleTokens[user.id] = access_token;
     }
+    console.log('[AUTH] Authentication successful. Returning session token.');
     res.json({ token, user });
   } catch (error) {
     console.error('Error verifying Google Token:', error);
