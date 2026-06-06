@@ -26,6 +26,13 @@ export default function SettingsTab({
 }) {
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [activeConnectingService, setActiveConnectingService] = useState(null);
   const [connectionStep, setConnectionStep] = useState('loading'); // 'loading', 'success', 'error'
@@ -87,14 +94,27 @@ export default function SettingsTab({
   return (
     <div className="sample-page" style={{ padding: '0', paddingTop: '10px', display: 'flex', flexDirection: 'row', height: '100%', overflow: 'hidden' }}>
       {/* Settings Sidebar */}
-      <div className="settings-sidebar" style={{ width: '220px', borderRight: '1px solid var(--border)', background: 'var(--surface)', padding: '12px 0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div 
+        className="settings-sidebar-v2" 
+        style={{ 
+          width: isMobile ? '60px' : '220px', 
+          borderRight: '1px solid var(--border)', 
+          background: 'var(--surface)', 
+          padding: isMobile ? '12px 6px' : '12px 0', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '8px',
+          alignItems: isMobile ? 'center' : 'stretch',
+          flexShrink: 0
+        }}
+      >
         {[
-          { id: 'Account', label: appLanguage === 'English' ? 'Account Profile' : 'የመገለጫ አካውንት', icon: <User size={16} /> },
-          { id: 'Customization', label: appLanguage === 'English' ? 'App Preferences' : 'መተግበሪያ ምርጫዎች', icon: <Palette size={16} /> },
-          { id: 'ModelCustomization', label: appLanguage === 'English' ? 'Model Customization' : 'የሞዴል ማስተካከያ', icon: <Cpu size={16} /> },
-          { id: 'MCP', label: appLanguage === 'English' ? 'MCP Integrations' : 'የ-MCP ግንኙነቶች', icon: <Globe size={16} /> },
-          { id: 'About', label: appLanguage === 'English' ? 'About Assistant' : 'ስለ ረዳቱ መግለጫ', icon: <Info size={16} /> },
-          { id: 'Privacy', label: appLanguage === 'English' ? 'Policy & Terms' : 'ምስጢራዊነት እና የአጠቃቀም ውል', icon: <Shield size={16} /> }
+          { id: 'Account', label: appLanguage === 'English' ? 'Account Profile' : 'የመገለጫ አካውንት', icon: <User size={16} />, emoji: '👤' },
+          { id: 'Customization', label: appLanguage === 'English' ? 'App Preferences' : 'መተግበሪያ ምርጫዎች', icon: <Palette size={16} />, emoji: '🎨' },
+          { id: 'ModelCustomization', label: appLanguage === 'English' ? 'Model Customization' : 'የሞዴል ማስተካከያ', icon: <Cpu size={16} />, emoji: '🤖' },
+          { id: 'MCP', label: appLanguage === 'English' ? 'MCP Integrations' : 'የ-MCP ግንኙነቶች', icon: <Globe size={16} />, emoji: '🌐' },
+          { id: 'About', label: appLanguage === 'English' ? 'About Assistant' : 'ስለ ረዳቱ መግለጫ', icon: <Info size={16} />, emoji: 'ℹ️' },
+          { id: 'Privacy', label: appLanguage === 'English' ? 'Policy & Terms' : 'ምስጢራዊነት እና የአጠቃቀም ውል', icon: <Shield size={16} />, emoji: '🛡️' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -102,30 +122,41 @@ export default function SettingsTab({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
-              width: '100%',
-              padding: '12px 24px',
+              justifyContent: isMobile ? 'center' : 'flex-start',
+              gap: isMobile ? '0' : '10px',
+              width: isMobile ? '40px' : '100%',
+              height: isMobile ? '40px' : 'auto',
+              padding: isMobile ? '0' : '12px 24px',
               background: activeSettingsTab === tab.id ? 'var(--surface-hover)' : 'transparent',
               border: 'none',
               borderLeft: `3px solid ${activeSettingsTab === tab.id ? 'var(--accent)' : 'transparent'}`,
               color: activeSettingsTab === tab.id ? 'var(--text)' : 'var(--text-muted)',
               cursor: 'pointer',
-              textAlign: 'left',
-              fontSize: '14px',
+              textAlign: isMobile ? 'center' : 'left',
+              fontSize: isMobile ? '20px' : '13.5px',
               fontWeight: '600',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
+              borderRadius: isMobile ? '8px' : '0',
+              flexShrink: 0
             }}
+            title={tab.label}
           >
-            {tab.icon}
-            <span>{tab.label}</span>
+            {isMobile ? (
+              tab.icon
+            ) : (
+              <>
+                {tab.icon}
+                <span>{tab.label}</span>
+              </>
+            )}
           </button>
         ))}
       </div>
 
       {/* Settings Content Area */}
-      <div style={{ flex: 1, padding: '16px 40px', overflowY: 'auto', textAlign: 'left' }}>
+      <div style={{ flex: 1, padding: isMobile ? '16px 12px' : '16px 40px', overflowY: 'auto', textAlign: 'left' }}>
         {activeSettingsTab === 'Account' && (
-          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: isMobile ? '16px' : '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '24px', color: 'var(--text)', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
               {appLanguage === 'English' ? 'Account Profile' : 'የመገለጫ መረጃ'}
             </h3>
@@ -185,55 +216,55 @@ export default function SettingsTab({
         )}
 
         {activeSettingsTab === 'Customization' && (
-          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: isMobile ? '16px' : '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '24px', color: 'var(--text)', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
               {appLanguage === 'English' ? 'App Preferences' : 'የመተግበሪያ ምርጫዎች'}
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--surface-2)', borderRadius: '12px', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => setAppLanguage(appLanguage === 'English' ? 'Amharic' : 'English')}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--surface-2)', borderRadius: '12px', border: '1px solid var(--border)', cursor: 'pointer', gap: '16px' }} onClick={() => setAppLanguage(appLanguage === 'English' ? 'Amharic' : 'English')}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, flex: 1 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', flexShrink: 0 }}>
                     <Languages size={18} />
                   </span>
-                  <div>
-                    <strong style={{ display: 'block', fontSize: '14.5px', color: 'var(--text)' }}>{appLanguage === 'English' ? 'Response Language' : 'የምላሽ ቋንቋ'}</strong>
-                    <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{appLanguage === 'English' ? 'Switch between English and Amharic' : 'በእንግሊዝኛ እና በአማርኛ መካከል ይቀያይሩ'}</span>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <strong style={{ display: 'block', fontSize: '14.5px', color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{appLanguage === 'English' ? 'Response Language' : 'የምላሽ ቋንቋ'}</strong>
+                    <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{appLanguage === 'English' ? 'Switch between English and Amharic' : 'በእንግሊዝኛ እና በአማርኛ መካከል ይቀያይሩ'}</span>
                   </div>
                 </div>
-                <label className="settings-toggle-switch" onClick={e => e.stopPropagation()}>
+                <label className="settings-toggle-switch" style={{ flexShrink: 0 }} onClick={e => e.stopPropagation()}>
                   <input type="checkbox" checked={appLanguage === 'Amharic'} onChange={() => setAppLanguage(appLanguage === 'English' ? 'Amharic' : 'English')} />
                   <span className="settings-toggle-thumb"></span>
                 </label>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--surface-2)', borderRadius: '12px', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => setIsLightMode(!isLightMode)}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '8px', background: !isLightMode ? 'rgba(99, 102, 241, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: !isLightMode ? '#6366f1' : '#f59e0b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--surface-2)', borderRadius: '12px', border: '1px solid var(--border)', cursor: 'pointer', gap: '16px' }} onClick={() => setIsLightMode(!isLightMode)}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, flex: 1 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '8px', background: !isLightMode ? 'rgba(99, 102, 241, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: !isLightMode ? '#6366f1' : '#f59e0b', flexShrink: 0 }}>
                     {!isLightMode ? <Moon size={18} /> : <Sun size={18} />}
                   </span>
-                  <div>
-                    <strong style={{ display: 'block', fontSize: '14.5px', color: 'var(--text)' }}>{appLanguage === 'English' ? 'Dark Mode' : 'ጨለማ ገጽታ'}</strong>
-                    <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{appLanguage === 'English' ? 'Use the dark theme across the app' : 'ጨለማ ገጽታን በመላው መተግበሪያ ይጠቀሙ'}</span>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <strong style={{ display: 'block', fontSize: '14.5px', color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{appLanguage === 'English' ? 'Dark Mode' : 'ጨለማ ገጽታ'}</strong>
+                    <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{appLanguage === 'English' ? 'Use the dark theme across the app' : 'ጨለማ ገጽታን በመላው መተግበሪያ ይጠቀሙ'}</span>
                   </div>
                 </div>
-                <label className="settings-toggle-switch" onClick={e => e.stopPropagation()}>
+                <label className="settings-toggle-switch" style={{ flexShrink: 0 }} onClick={e => e.stopPropagation()}>
                   <input type="checkbox" checked={!isLightMode} onChange={() => setIsLightMode(!isLightMode)} />
                   <span className="settings-toggle-thumb"></span>
                 </label>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--surface-2)', borderRadius: '12px', border: '1px solid var(--border)', cursor: 'pointer' }} onClick={() => setIsTtsEnabled(!isTtsEnabled)}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '8px', background: isTtsEnabled ? 'rgba(34, 197, 94, 0.1)' : 'rgba(100, 116, 139, 0.1)', color: isTtsEnabled ? '#22c55e' : '#64748b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--surface-2)', borderRadius: '12px', border: '1px solid var(--border)', cursor: 'pointer', gap: '16px' }} onClick={() => setIsTtsEnabled(!isTtsEnabled)}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, flex: 1 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '8px', background: isTtsEnabled ? 'rgba(34, 197, 94, 0.1)' : 'rgba(100, 116, 139, 0.1)', color: isTtsEnabled ? '#22c55e' : '#64748b', flexShrink: 0 }}>
                     {isTtsEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
                   </span>
-                  <div>
-                    <strong style={{ display: 'block', fontSize: '14.5px', color: 'var(--text)' }}>{appLanguage === 'English' ? 'Text-to-Speech' : 'ጽሑፍን ወደ ድምጽ'}</strong>
-                    <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>{appLanguage === 'English' ? 'Automatically read AI responses aloud' : 'የ AI ምላሾችን በራስ-ሰር ድምጽ ያንብቡ'}</span>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <strong style={{ display: 'block', fontSize: '14.5px', color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{appLanguage === 'English' ? 'Text-to-Speech' : 'ጽሑፍን ወደ ድምጽ'}</strong>
+                    <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{appLanguage === 'English' ? 'Automatically read AI responses aloud' : 'የ AI ምላሾችን በራስ-ሰር ድምጽ ያንብቡ'}</span>
                   </div>
                 </div>
-                <label className="settings-toggle-switch" onClick={e => e.stopPropagation()}>
+                <label className="settings-toggle-switch" style={{ flexShrink: 0 }} onClick={e => e.stopPropagation()}>
                   <input type="checkbox" checked={isTtsEnabled} onChange={() => setIsTtsEnabled(!isTtsEnabled)} />
                   <span className="settings-toggle-thumb"></span>
                 </label>
@@ -243,7 +274,7 @@ export default function SettingsTab({
         )}
 
         {activeSettingsTab === 'Privacy' && (
-          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: isMobile ? '16px' : '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '24px', color: 'var(--text)', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
               {appLanguage === 'English' ? 'Policy & Terms' : 'ምስጢራዊነት እና የአጠቃቀም ውል'}
             </h3>
@@ -334,7 +365,7 @@ export default function SettingsTab({
         )}
 
         {activeSettingsTab === 'ModelCustomization' && (
-          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: isMobile ? '16px' : '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '24px', color: 'var(--text)', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
               {appLanguage === 'English' ? 'Model Customization' : 'የሞዴል ማስተካከያ'}
             </h3>
@@ -360,9 +391,12 @@ export default function SettingsTab({
                   }}
                 >
                   <option value="gemini-2.5-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.5 Flash (Default/Recommended)</option>
-                  <option value="gemini-1.5-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 1.5 Flash</option>
-                  <option value="gemini-1.5-pro" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 1.5 Pro (Expert Diagnostics)</option>
+                  <option value="gemini-2.5-pro" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.5 Pro (Deep Clinical Reasoning)</option>
                   <option value="gemini-2.0-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.0 Flash (Fast Response)</option>
+                  <option value="gemini-2.0-pro-exp-02-05" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.0 Pro Experimental</option>
+                  <option value="gemini-2.0-flash-thinking-exp-01-21" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.0 Flash Thinking Experimental</option>
+                  <option value="gemini-1.5-pro" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 1.5 Pro (Expert Diagnostics)</option>
+                  <option value="gemini-1.5-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 1.5 Flash</option>
                 </select>
               </div>
 
@@ -388,7 +422,7 @@ export default function SettingsTab({
         )}
 
         {activeSettingsTab === 'MCP' && (
-          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: isMobile ? '16px' : '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '24px', color: 'var(--text)', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
               {appLanguage === 'English' ? 'Model Context Protocol (MCP) Integrations' : 'የ-MCP ውጫዊ ግንኙነቶች'}
             </h3>
@@ -609,7 +643,7 @@ export default function SettingsTab({
           </div>
         )}
         {activeSettingsTab === 'About' && (
-          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: isMobile ? '16px' : '32px', width: '100%', maxWidth: '640px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '24px', color: 'var(--text)', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
               {appLanguage === 'English' ? 'About Assistant' : 'ስለ ረዳቱ መግለጫ'}
             </h3>

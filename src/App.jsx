@@ -1176,6 +1176,34 @@ function App() {
     }
   };
 
+  const handleCopyText = (text, msgId) => {
+    const fallbackCopy = (val) => {
+      const textArea = document.createElement('textarea');
+      textArea.value = val;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+      }
+      document.body.removeChild(textArea);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+    setCopiedMsgId(msgId);
+    setTimeout(() => setCopiedMsgId(null), 2000);
+  };
+
   const editUserMessage = (msgId) => {
     const idx = messages.findIndex(m => m.id === msgId);
     if (idx === -1) return;
@@ -2917,6 +2945,17 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               <div className="messages-area" ref={chatAreaRef} onScroll={handleChatScroll}>
                 {messages.map((msg, index) => {
                   const { body, references, images } = msg.role === 'ai' ? parseReferences(msg.text) : { body: msg.text, references: [], images: [] };
+                  const lines = body.split('\n');
+                  const mainTextLines = [];
+                  const choiceLines = [];
+                  lines.forEach(line => {
+                    const trimmed = line.trim();
+                    if (/^[A-Z][).]\s/.test(trimmed) || /^(Choose one|Choose all that apply)/i.test(trimmed)) {
+                      choiceLines.push(trimmed);
+                    } else {
+                      mainTextLines.push(line);
+                    }
+                  });
                   return (
                   <div key={msg.id || index} className={`message-row ${msg.role}`}>
                     <div className="message-content">
@@ -3018,7 +3057,89 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                               </button>
                             </div>
                           ) : (
-                            msg.role === 'ai' ? <MarkdownRenderer content={body} /> : msg.text
+                            msg.role === 'ai' ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <MarkdownRenderer content={mainTextLines.join('\n')} />
+                                {choiceLines.length > 0 && (() => {
+                                  const isMultipleChoice = /Choose all that apply|Select multiple|Select all/i.test(msg.text) ||
+                                                           /ሁሉ(ንም)?.*?ይምረጡ/i.test(msg.text) ||
+                                                           choiceLines.some(line => /Choose all that apply|Select multiple|Select all/i.test(line));
+                                  return (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px', width: '100%', maxWidth: '420px' }}>
+                                      {choiceLines.map((choice, i) => {
+                                        if (/^(Choose one|Choose all that apply)/i.test(choice)) {
+                                           return <div key={i} style={{fontSize:'11px', color: 'var(--text-muted)', fontStyle:'italic'}}>{choice}</div>
+                                        }
+                                        const isSelected = !!selectedChoices[msg.id || index]?.[choice];
+                                        return (
+                                          <button 
+                                            key={i}
+                                            onClick={() => {
+                                              if (isMultipleChoice) {
+                                                setSelectedChoices(prev => {
+                                                  const msgChoices = prev[msg.id || index] || {};
+                                                  return {
+                                                    ...prev,
+                                                    [msg.id || index]: {
+                                                      ...msgChoices,
+                                                      [choice]: !msgChoices[choice]
+                                                    }
+                                                  };
+                                                });
+                                              } else {
+                                                handleTextSubmit(choice);
+                                              }
+                                            }}
+                                            style={{
+                                              background: isSelected 
+                                                ? 'var(--accent)' 
+                                                : 'rgba(212,163,115,0.06)',
+                                              border: `1px solid ${isSelected ? 'var(--accent)' : 'rgba(212,163,115,0.15)'}`,
+                                              borderRadius: '8px', padding: '10px 14px',
+                                              color: isSelected 
+                                                ? '#ffffff' 
+                                                : 'var(--text)',
+                                              textAlign: 'left',
+                                              cursor: 'pointer', transition: 'all 0.2s', fontSize: '13px',
+                                              fontWeight: '500',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'space-between',
+                                              width: '100%'
+                                            }}
+                                          >
+                                            <span>{choice}</span>
+                                            {isSelected && <CheckCheck size={14} style={{ color: '#ffffff', marginLeft: '8px' }} />}
+                                          </button>
+                                        );
+                                      })}
+
+                                      {isMultipleChoice && (() => {
+                                        const msgChoices = selectedChoices[msg.id || index] || {};
+                                        const selectedList = Object.keys(msgChoices).filter(k => msgChoices[k]);
+                                        if (selectedList.length === 0) return null;
+                                        return (
+                                          <button
+                                            onClick={() => {
+                                              handleTextSubmit(selectedList.join(', '));
+                                              setSelectedChoices(prev => {
+                                                const updated = { ...prev };
+                                                delete updated[msg.id || index];
+                                                return updated;
+                                              });
+                                            }}
+                                            className="read-report-btn"
+                                            style={{ width: '100%', marginTop: '8px', padding: '10px', borderRadius: '8px', textTransform: 'none' }}
+                                            >
+                                              {appLanguage === 'English' ? `Submit Selections (${selectedList.length})` : `ምርጫዎችን አስገባ (${selectedList.length})`}
+                                            </button>
+                                        );
+                                      })()}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            ) : msg.text
                           )}
                         </div>
                         {msg.hasError && (
@@ -3045,7 +3166,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                             <button className="msg-action-btn" onClick={() => retryMessage(msg.id)} title="Regenerate response">
                               <RefreshCcw size={13}/><span>Retry</span>
                             </button>
-                            <button className="msg-action-btn" onClick={() => { navigator.clipboard.writeText(msg.text); setCopiedMsgId(msg.id); setTimeout(() => setCopiedMsgId(null), 2000); }} title="Copy message">
+                            <button className="msg-action-btn" onClick={() => handleCopyText(msg.text, msg.id)} title="Copy message">
                               {copiedMsgId === msg.id ? <CheckCheck size={13}/> : <Copy size={13}/>}<span>{copiedMsgId === msg.id ? 'Copied!' : 'Copy'}</span>
                             </button>
                             <button className="msg-action-btn" onClick={() => translateMsg(msg)} disabled={translatingId === msg.id} title="Translate">
@@ -3060,7 +3181,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                         )}
                         {msg.role === 'user' && (
                           <div className="msg-actions">
-                            <button className="msg-action-btn" onClick={() => { navigator.clipboard.writeText(msg.text); setCopiedMsgId(msg.id); setTimeout(() => setCopiedMsgId(null), 2000); }} title="Copy message">
+                            <button className="msg-action-btn" onClick={() => handleCopyText(msg.text, msg.id)} title="Copy message">
                               {copiedMsgId === msg.id ? <CheckCheck size={13}/> : <Copy size={13}/>}<span>{copiedMsgId === msg.id ? 'Copied!' : 'Copy'}</span>
                             </button>
                             <button className="msg-action-btn" onClick={() => editUserMessage(msg.id)} title="Edit message">

@@ -160,7 +160,8 @@ export function useGeminiApi({
     setIsThinking(true);
     try {
       const base64Audio = await blobToBase64(audioBlob);
-      const historyText = conversationHistoryRef.current
+      const conversationHistory = conversationHistoryRef.current.filter(m => m.role !== 'system');
+      const historyText = conversationHistory
         .map(m => `${m.role === 'user' ? 'Patient' : 'Doctor'}: ${m.text}`)
         .join('\n');
 
@@ -180,7 +181,8 @@ export function useGeminiApi({
         systemInstruction: {
           parts: [{
             text: (() => {
-              let basePrompt = customSystemPrompt ? customSystemPrompt : getMcpSystemInstructions(targetLangStr, false, appLanguage, true);
+              const systemMsg = conversationHistoryRef.current.find(m => m.role === 'system');
+              let basePrompt = systemMsg ? systemMsg.text : (customSystemPrompt ? customSystemPrompt : getMcpSystemInstructions(targetLangStr, false, appLanguage, true));
               if (masterReport && masterReport.messages) {
                 const reportText = masterReport.messages.map(m => m.text).join("\n");
                 basePrompt += `\n\nACTIVE MEDICAL SESSION REPORT / PLAN CONTEXT:\n${reportText}\nIf the user asks you to save, back up, or export their session report or plan (e.g. "Backup my Session report"), you MUST use the "backup_session_report" tool and pass this active plan text as the "content" parameter!`;
@@ -375,14 +377,21 @@ Here is what I do:
     }
 
     try {
-      const historyText = conversationHistoryRef.current
+      const conversationHistory = conversationHistoryRef.current.filter(m => m.role !== 'system');
+      const historyText = conversationHistory
         .map(m => `${m.role === 'user' ? 'Patient' : 'Doctor'}: ${m.text}`)
         .join('\n');
 
       const targetLangStr = appLanguage === 'English' ? 'English' : 'Amharic (አማርኛ)';
       const isMobile = window.innerWidth < 768;
       let prompt;
-      if (isThinkingMode) {
+      const isDiagnostic = conversationHistoryRef.current.some(m => m.role === 'system' && (m.text.includes("You are Divya") || m.text.includes("structured conversation") || m.text.includes("DIAGNOSTIC") || m.text.includes("PHASE 1")));
+
+      if (isDiagnostic) {
+        prompt = historyText
+          ? `Previous conversation:\n${historyText}\n\nThe patient just answered. Respond strictly according to your structured diagnostic flow instruction and system guidelines in ${targetLangStr} only. Ask only one follow-up question, or output the structured clinical report with assessment and nutrition plan JSON if the session has concluded.`
+          : `The patient just started the session. Greet them and ask the first diagnostic question as instructed in your system guidelines in ${targetLangStr} only.`;
+      } else if (isThinkingMode) {
         if (isMobile) {
           prompt = historyText
             ? `Previous conversation:\n${historyText}\n\nThe patient just sent a message. Provide a concise, clear, and highly focused thinking-mode medical response in ${targetLangStr} only (or Amharic if they speak/write in Amharic or ask for it). Limit response length to be compact and easily readable on a mobile screen (around 150-200 words max), focusing only on the most essential details, direct treatment options, and clear recommendations.`
@@ -409,7 +418,8 @@ Here is what I do:
         systemInstruction: {
           parts: [{
             text: (() => {
-              let basePrompt = customSystemPrompt ? customSystemPrompt : getMcpSystemInstructions(targetLangStr, isThinkingMode, appLanguage);
+              const systemMsg = conversationHistoryRef.current.find(m => m.role === 'system');
+              let basePrompt = systemMsg ? systemMsg.text : (customSystemPrompt ? customSystemPrompt : getMcpSystemInstructions(targetLangStr, isThinkingMode, appLanguage));
               if (masterReport && masterReport.messages) {
                 const reportText = masterReport.messages.map(m => m.text).join("\n");
                 basePrompt += `\n\nACTIVE MEDICAL SESSION REPORT / PLAN CONTEXT:\n${reportText}\nIf the user asks you to save, back up, or export their session report or plan (e.g. "Backup my Session report"), you MUST use the "backup_session_report" tool and pass this active plan text as the "content" parameter!`;
