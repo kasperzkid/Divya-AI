@@ -731,7 +731,7 @@ function App() {
               }
             }
 
-            const chatSessions = res.data.sessions.filter(s => s.id !== `master_report_${user.id}`);
+            const chatSessions = res.data.sessions.filter(s => s.id !== `master_report_${user.id}` && s.id !== `plan_data_${user.id}`);
             if (chatSessions.length > 0) {
               setChats(chatSessions);
               loadChat(chatSessions[0]);
@@ -850,7 +850,7 @@ function App() {
       localStorage.setItem(`chats_${user.id}`, JSON.stringify(chats));
       
       const activeChat = chats.find(c => c.id === currentChatId);
-      if (activeChat && activeChat.messages && activeChat.messages.length > 0 && activeChat.id !== `master_report_${user.id}`) {
+      if (activeChat && activeChat.messages && activeChat.messages.length > 0 && activeChat.id !== `master_report_${user.id}` && activeChat.id !== `plan_data_${user.id}`) {
         axios.post('/api/sessions', {
           id: activeChat.id,
           title: activeChat.title,

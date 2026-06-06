@@ -219,12 +219,27 @@ app.get('/api/sessions', authenticateToken, async (req, res) => {
       [req.userId]
     );
 
+    if (sessions.length === 0) {
+      return res.json({ sessions: [] });
+    }
+
+    const sessionIds = sessions.map(s => s.id);
+    const [messages] = await pool.query(
+      'SELECT session_id, role, text FROM health_ai.messages WHERE session_id IN (?) ORDER BY id ASC',
+      [sessionIds]
+    );
+
+    // Group messages by session_id in O(M) time instead of O(N * M)
+    const messagesBySession = {};
+    for (let msg of messages) {
+      if (!messagesBySession[msg.session_id]) {
+        messagesBySession[msg.session_id] = [];
+      }
+      messagesBySession[msg.session_id].push({ role: msg.role, text: msg.text });
+    }
+
     for (let session of sessions) {
-      const [messages] = await pool.query(
-        'SELECT role, text FROM health_ai.messages WHERE session_id = ? ORDER BY id ASC',
-        [session.id]
-      );
-      session.messages = messages;
+      session.messages = messagesBySession[session.id] || [];
     }
 
     res.json({ sessions });

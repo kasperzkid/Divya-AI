@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { 
   Apple, HeartPulse, ClipboardList, Flame, Clock, Users, Plus, Minus, 
   ArrowDownRight, ArrowUpRight, Scale, Check, Smile, Award, Activity, 
-  Droplet, Sparkles, BookOpen, ChevronRight, X, AlertCircle, ShoppingBag, Eye 
+  Droplet, Sparkles, BookOpen, ChevronRight, X, AlertCircle, ShoppingBag, Eye,
+  Stethoscope
 } from 'lucide-react';
 
 const MEALS_POOL = [
