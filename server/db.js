@@ -1,5 +1,17 @@
 const { Pool } = require('pg');
 
+// Safe configuration logging for easy deployment troubleshooting on Render
+if (process.env.DATABASE_URL) {
+  console.log(`[DB-INIT] Detected DATABASE_URL environment variable (length: ${process.env.DATABASE_URL.length}). Attempting pool connection...`);
+} else {
+  console.log('[DB-INIT] DATABASE_URL not found. Falling back to individual parameters:');
+  console.log(`  - Host: ${process.env.DB_HOST || 'localhost'}`);
+  console.log(`  - User: ${process.env.DB_USER || 'postgres'}`);
+  console.log(`  - Database: ${process.env.DB_NAME || 'postgres'}`);
+  console.log(`  - Port: ${process.env.DB_PORT || 5432}`);
+  console.log(`  - SSL: ${process.env.DB_SSL === 'true'}`);
+}
+
 const config = process.env.DATABASE_URL
   ? {
       connectionString: process.env.DATABASE_URL,
