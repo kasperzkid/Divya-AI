@@ -434,19 +434,21 @@ export default function SettingsTab({
                 <div 
                   style={{ 
                     display: 'flex', 
+                    flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between', 
-                    alignItems: 'center', 
+                    alignItems: isMobile ? 'flex-start' : 'center', 
                     padding: '18px', 
                     background: 'var(--surface-2)', 
                     borderRadius: '16px', 
                     border: `1px solid ${settings.mcpGoogleDrive ? 'var(--accent)' : 'var(--border)'}`, 
                     cursor: 'pointer',
                     transition: 'all 0.2s',
-                    boxShadow: settings.mcpGoogleDrive ? 'var(--glow-accent)' : 'none'
+                    boxShadow: settings.mcpGoogleDrive ? 'var(--glow-accent)' : 'none',
+                    gap: isMobile ? '16px' : '0'
                   }} 
                   onClick={() => triggerConnectionFlow('mcpGoogleDrive', settings.mcpGoogleDrive)}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, width: '100%' }}>
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '12px', background: isLightMode ? '#f8f9fa' : 'rgba(255,255,255,0.03)', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', flexShrink: 0 }}>
                       <svg width="24" height="24" viewBox="0 0 1443 1250" style={{ display: 'block', width: '24px', height: '24px' }}>
                         <path d="M481 0h481l481 833H962L481 0z" fill="#0066da"/>
@@ -454,16 +456,25 @@ export default function SettingsTab({
                         <path d="M241 416L481 0h962l-241 416H241z" fill="#ffba00"/>
                       </svg>
                     </span>
-                    <div style={{ minWidth: 0 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <strong style={{ display: 'block', fontSize: '15px', color: 'var(--text)' }}>
                         {appLanguage === 'English' ? 'Google Drive Link' : 'የ Google Drive ግንኙነት'}
                       </strong>
-                      <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                      <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: isMobile ? 'normal' : 'nowrap', marginTop: '2px', lineHeight: '1.4' }}>
                         {appLanguage === 'English' ? 'Auto-save diagnostic reports & clinical summaries' : 'የጤና ሪፖርቶችን በ Drive ውስጥ በራስ-ሰር ያስቀምጡ'}
                       </span>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: isMobile ? 'space-between' : 'flex-end', 
+                    gap: '14px', 
+                    flexShrink: 0,
+                    width: isMobile ? '100%' : 'auto',
+                    borderTop: isMobile ? '1px solid var(--border)' : 'none',
+                    paddingTop: isMobile ? '12px' : '0'
+                  }}>
                     {settings.mcpGoogleDrive ? (
                       <span style={{ fontSize: '10px', fontWeight: '800', color: '#10b981', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(16,185,129,0.08)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.15)' }}>
                         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
@@ -487,19 +498,21 @@ export default function SettingsTab({
                 <div 
                   style={{ 
                     display: 'flex', 
+                    flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between', 
-                    alignItems: 'center', 
+                    alignItems: isMobile ? 'flex-start' : 'center', 
                     padding: '18px', 
                     background: 'var(--surface-2)', 
                     borderRadius: '16px', 
                     border: `1px solid ${settings.mcpGoogleCalendar ? 'var(--accent)' : 'var(--border)'}`, 
                     cursor: 'pointer',
                     transition: 'all 0.2s',
-                    boxShadow: settings.mcpGoogleCalendar ? 'var(--glow-accent)' : 'none'
+                    boxShadow: settings.mcpGoogleCalendar ? 'var(--glow-accent)' : 'none',
+                    gap: isMobile ? '16px' : '0'
                   }} 
                   onClick={() => triggerConnectionFlow('mcpGoogleCalendar', settings.mcpGoogleCalendar)}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, width: '100%' }}>
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '12px', background: isLightMode ? '#f8f9fa' : 'rgba(255,255,255,0.03)', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', flexShrink: 0 }}>
                       <svg width="24" height="24" viewBox="0 0 192 192" style={{ display: 'block', width: '24px', height: '24px' }}>
                         <rect x="24" y="24" width="144" height="144" rx="28" fill="#ffffff" stroke="#1a73e8" strokeWidth="12"/>
@@ -507,16 +520,25 @@ export default function SettingsTab({
                         <text x="96" y="132" textAnchor="middle" fill="#1a73e8" fontSize="64" fontWeight="900" fontFamily="sans-serif">31</text>
                       </svg>
                     </span>
-                    <div style={{ minWidth: 0 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <strong style={{ display: 'block', fontSize: '15px', color: 'var(--text)' }}>
                         {appLanguage === 'English' ? 'Google Calendar Link' : 'የ Google Calendar ግንኙነት'}
                       </strong>
-                      <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                      <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: isMobile ? 'normal' : 'nowrap', marginTop: '2px', lineHeight: '1.4' }}>
                         {appLanguage === 'English' ? 'Ambiently schedule physical checkups & diagnostic appointments' : 'የህክምና ቀጠሮዎችን በራስ-ሰር ያመሳስሉ'}
                       </span>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: isMobile ? 'space-between' : 'flex-end', 
+                    gap: '14px', 
+                    flexShrink: 0,
+                    width: isMobile ? '100%' : 'auto',
+                    borderTop: isMobile ? '1px solid var(--border)' : 'none',
+                    paddingTop: isMobile ? '12px' : '0'
+                  }}>
                     {settings.mcpGoogleCalendar ? (
                       <span style={{ fontSize: '10px', fontWeight: '800', color: '#10b981', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(16,185,129,0.08)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.15)' }}>
                         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
@@ -540,35 +562,46 @@ export default function SettingsTab({
                 <div 
                   style={{ 
                     display: 'flex', 
+                    flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between', 
-                    alignItems: 'center', 
+                    alignItems: isMobile ? 'flex-start' : 'center', 
                     padding: '18px', 
                     background: 'var(--surface-2)', 
                     borderRadius: '16px', 
                     border: `1px solid ${settings.mcpEmail ? 'var(--accent)' : 'var(--border)'}`, 
                     cursor: 'pointer',
                     transition: 'all 0.2s',
-                    boxShadow: settings.mcpEmail ? 'var(--glow-accent)' : 'none'
+                    boxShadow: settings.mcpEmail ? 'var(--glow-accent)' : 'none',
+                    gap: isMobile ? '16px' : '0'
                   }} 
                   onClick={() => triggerConnectionFlow('mcpEmail', settings.mcpEmail)}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, width: '100%' }}>
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '12px', background: isLightMode ? '#f8f9fa' : 'rgba(255,255,255,0.03)', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', flexShrink: 0 }}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', width: '24px', height: '24px' }}>
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                         <polyline points="22,6 12,13 2,6" />
                       </svg>
                     </span>
-                    <div style={{ minWidth: 0 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <strong style={{ display: 'block', fontSize: '15px', color: 'var(--text)' }}>
                         {appLanguage === 'English' ? 'Email Notifications' : 'የኢሜል ማሳወቂያዎች'}
                       </strong>
-                      <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                      <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: isMobile ? 'normal' : 'nowrap', marginTop: '2px', lineHeight: '1.4' }}>
                         {appLanguage === 'English' ? 'Send medical reports and daily summaries straight to your inbox' : 'የጤና ሪፖርቶችን እና ዕለታዊ መግለጫዎችን በኢሜልዎ ይቀበሉ'}
                       </span>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: isMobile ? 'space-between' : 'flex-end', 
+                    gap: '14px', 
+                    flexShrink: 0,
+                    width: isMobile ? '100%' : 'auto',
+                    borderTop: isMobile ? '1px solid var(--border)' : 'none',
+                    paddingTop: isMobile ? '12px' : '0'
+                  }}>
                     {settings.mcpEmail ? (
                       <span style={{ fontSize: '10px', fontWeight: '800', color: '#10b981', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(16,185,129,0.08)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.15)' }}>
                         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
@@ -592,35 +625,46 @@ export default function SettingsTab({
                 <div 
                   style={{ 
                     display: 'flex', 
+                    flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between', 
-                    alignItems: 'center', 
+                    alignItems: isMobile ? 'flex-start' : 'center', 
                     padding: '18px', 
                     background: 'var(--surface-2)', 
                     borderRadius: '16px', 
                     border: `1px solid ${settings.mcpGoogleMaps ? 'var(--accent)' : 'var(--border)'}`, 
                     cursor: 'pointer',
                     transition: 'all 0.2s',
-                    boxShadow: settings.mcpGoogleMaps ? 'var(--glow-accent)' : 'none'
+                    boxShadow: settings.mcpGoogleMaps ? 'var(--glow-accent)' : 'none',
+                    gap: isMobile ? '16px' : '0'
                   }} 
                   onClick={() => triggerConnectionFlow('mcpGoogleMaps', settings.mcpGoogleMaps)}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, width: '100%' }}>
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '12px', background: isLightMode ? '#f8f9fa' : 'rgba(255,255,255,0.03)', boxShadow: '0 4px 12px rgba(0,0,0,0.04)', flexShrink: 0 }}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', width: '24px', height: '24px' }}>
                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                         <circle cx="12" cy="10" r="3" />
                       </svg>
                     </span>
-                    <div style={{ minWidth: 0 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <strong style={{ display: 'block', fontSize: '15px', color: 'var(--text)' }}>
                         {appLanguage === 'English' ? 'Google Maps Finder' : 'የ Google Maps መፈለጊያ'}
                       </strong>
-                      <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', marginTop: '2px' }}>
+                      <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: isMobile ? 'normal' : 'nowrap', marginTop: '2px', lineHeight: '1.4' }}>
                         {appLanguage === 'English' ? 'Locate nearby clinics, specialists, and 24/7 pharmacies automatically' : 'በአቅራቢያዎ ያሉ ክሊኒኮችን እና ፋርማሲዎችን በካርታ ላይ ያግኙ'}
                       </span>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexShrink: 0 }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: isMobile ? 'space-between' : 'flex-end', 
+                    gap: '14px', 
+                    flexShrink: 0,
+                    width: isMobile ? '100%' : 'auto',
+                    borderTop: isMobile ? '1px solid var(--border)' : 'none',
+                    paddingTop: isMobile ? '12px' : '0'
+                  }}>
                     {settings.mcpGoogleMaps ? (
                       <span style={{ fontSize: '10px', fontWeight: '800', color: '#10b981', display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(16,185,129,0.08)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.15)' }}>
                         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />

@@ -339,6 +339,7 @@ function App() {
   const [unfinishedSessions, setUnfinishedSessions]   = useState([]);
   const [showUnfinishedModal, setShowUnfinishedModal] = useState(false);
   const [confirmModal, setConfirmModal]               = useState({ isOpen: false, message: '', onConfirm: null });
+  const [sessionModeModal, setSessionModeModal]       = useState({ isOpen: false, onSelect: null });
   const [renameModal, setRenameModal]                 = useState({ isOpen: false, currentTitle: '', onConfirm: null });
   const [renameInputText, setRenameInputText]         = useState('');
   const [analyticsChecklist, setAnalyticsChecklist]   = useState({});
@@ -1506,14 +1507,13 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
 
     // Initialize diagnostic session
     conversationHistoryRef.current = [{ role: 'system', text: diagnosticPrompt }];
-    setMessages([{ id: Date.now(), role: 'ai', text: appLanguage === 'English' ? 'Hello! I am Divya, your health assistant. What is your main complaint today?' : 'ሰላም! እኔ ዲቭያ (Divya) የጤና ረዳትዎ ነኝ። ዛሬ ዋናው ቅሬታዎ ወይም የህመም ስሜትዎ ምንድነው?' }]);
+    const firstMsg = { id: Date.now(), role: 'ai', text: appLanguage === 'English' ? 'Hello! I am Divya, your health assistant. What is your main complaint today?' : 'ሰላም! እኔ ዲቭያ (Divya) የጤና ረዳትዎ ነኝ። ዛሬ ዋናው ቅሬታዎ ወይም የህመም ስሜትዎ ምንድነው?' };
+    setMessages([firstMsg]);
     
-    // Start the call immediately with Phase 1
-    const greeting = appLanguage === 'English' 
-      ? 'Hello! I am Divya, your health assistant. What is your main complaint today?' 
-      : 'ሰላም! እኔ ዲቭያ (Divya) የጤና ረዳትዎ ነኝ። ዛሬ ዋናው ቅሬታዎ ወይም የህመም ስሜትዎ ምንድነው?';
-    
-    startCall(greeting);
+    setActiveTab('chat');
+    if (isTtsEnabled) {
+      speak(firstMsg.text, firstMsg.id);
+    }
   };
 
   const startRevisionSession = () => {
@@ -1568,8 +1568,13 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
       ? "Hello! Let's do a follow-up revision on your previous report. How are you feeling today, and did you take the recommended tests or pills?"
       : "ሰላም! በቀደመው ሪፖርትዎ ላይ የክትትል ክለሳ እናድርግ። ዛሬ እንዴት ነዎት? የተመከሩትን ምርመራዎች አድርገዋል ወይም መድሃኒቶችን ወስደዋል?";
 
-    setMessages([{ id: Date.now(), role: 'ai', text: greeting }]);
-    startCall(greeting);
+    const firstMsg = { id: Date.now(), role: 'ai', text: greeting };
+    setMessages([firstMsg]);
+    
+    setActiveTab('chat');
+    if (isTtsEnabled) {
+      speak(greeting, firstMsg.id);
+    }
   };
 
   const resumeUnfinishedSession = (session) => {
@@ -1583,7 +1588,10 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
       ? aiMsgs[aiMsgs.length - 1].text 
       : (appLanguage === 'English' ? 'Hello, let us continue our diagnosis.' : 'ሰላም፣ ምርመራችንን እንቀጥል።');
     
-    startCall(lastAiMsgText);
+    setActiveTab('chat');
+    if (isTtsEnabled) {
+      speak(lastAiMsgText);
+    }
     
     // Remove from unfinished sessions list since we are resuming it!
     setUnfinishedSessions(prev => prev.filter(s => s.id !== session.id));
