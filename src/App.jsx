@@ -1251,12 +1251,23 @@ function App() {
     callTimeoutRef.current = setTimeout(() => { setCallStatus('speaking'); speak(greeting); }, 1000);
   };
 
-  function startDiagnosticSession(forceNew = false) {
+  function startDiagnosticSession(forceNew = false, selectedMode = null) {
     if (!forceNew && unfinishedSessions.length > 0) {
       setShowUnfinishedModal(true);
       return;
     }
     setShowUnfinishedModal(false);
+
+    if (!selectedMode) {
+      setSessionModeModal({
+        isOpen: true,
+        onSelect: (mode) => {
+          startDiagnosticSession(forceNew, mode);
+        }
+      });
+      return;
+    }
+
     setIsDiagnosticMode(true);
     
     const diagnosticPrompt = `You are Divya, a professional AI health assistant. 
@@ -1510,13 +1521,30 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
     const firstMsg = { id: Date.now(), role: 'ai', text: appLanguage === 'English' ? 'Hello! I am Divya, your health assistant. What is your main complaint today?' : 'ሰላም! እኔ ዲቭያ (Divya) የጤና ረዳትዎ ነኝ። ዛሬ ዋናው ቅሬታዎ ወይም የህመም ስሜትዎ ምንድነው?' };
     setMessages([firstMsg]);
     
-    setActiveTab('chat');
-    if (isTtsEnabled) {
+    if (selectedMode === 'chat') {
+      setActiveTab('chat');
+      setIsTtsEnabled(false);
+    } else if (selectedMode === 'voice') {
+      startCall(firstMsg.text);
+      setIsTtsEnabled(true);
+    } else if (selectedMode === 'hybrid') {
+      setActiveTab('chat');
+      setIsTtsEnabled(true);
       speak(firstMsg.text, firstMsg.id);
     }
   };
 
-  const startRevisionSession = () => {
+  const startRevisionSession = (selectedMode = null) => {
+    if (!selectedMode) {
+      setSessionModeModal({
+        isOpen: true,
+        onSelect: (mode) => {
+          startRevisionSession(mode);
+        }
+      });
+      return;
+    }
+
     setIsDiagnosticMode(true);
     
     // Build a custom follow-up prompt based on the previous master report assessment
@@ -1571,13 +1599,30 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
     const firstMsg = { id: Date.now(), role: 'ai', text: greeting };
     setMessages([firstMsg]);
     
-    setActiveTab('chat');
-    if (isTtsEnabled) {
+    if (selectedMode === 'chat') {
+      setActiveTab('chat');
+      setIsTtsEnabled(false);
+    } else if (selectedMode === 'voice') {
+      startCall(greeting);
+      setIsTtsEnabled(true);
+    } else if (selectedMode === 'hybrid') {
+      setActiveTab('chat');
+      setIsTtsEnabled(true);
       speak(greeting, firstMsg.id);
     }
   };
 
-  const resumeUnfinishedSession = (session) => {
+  const resumeUnfinishedSession = (session, selectedMode = null) => {
+    if (!selectedMode) {
+      setSessionModeModal({
+        isOpen: true,
+        onSelect: (mode) => {
+          resumeUnfinishedSession(session, mode);
+        }
+      });
+      return;
+    }
+
     setIsDiagnosticMode(true);
     setMessages(session.messages || []);
     conversationHistoryRef.current = session.messages ? session.messages.map(m => ({ role: m.role, text: m.text })) : [];
@@ -1588,8 +1633,15 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
       ? aiMsgs[aiMsgs.length - 1].text 
       : (appLanguage === 'English' ? 'Hello, let us continue our diagnosis.' : 'ሰላም፣ ምርመራችንን እንቀጥል።');
     
-    setActiveTab('chat');
-    if (isTtsEnabled) {
+    if (selectedMode === 'chat') {
+      setActiveTab('chat');
+      setIsTtsEnabled(false);
+    } else if (selectedMode === 'voice') {
+      startCall(lastAiMsgText);
+      setIsTtsEnabled(true);
+    } else if (selectedMode === 'hybrid') {
+      setActiveTab('chat');
+      setIsTtsEnabled(true);
       speak(lastAiMsgText);
     }
     
@@ -2407,7 +2459,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
             <img src="/favicon.svg" alt="Logo" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
             <div>
               <h1>የጤና ረዳት</h1>
-              <p>Health Assistant</p>
+              <p>Divya AI</p>
             </div>
           </div>
         </div>
@@ -4565,6 +4617,96 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {sessionModeModal.isOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', 
+          backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', 
+          justifyContent: 'center', zIndex: 1000, padding: '20px'
+        }}>
+          <div style={{
+            background: 'var(--surface-2)', border: '1px solid var(--border-active)', 
+            borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '440px', 
+            boxShadow: '0 20px 50px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', gap: '24px'
+          }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: 'var(--text)', fontFamily: 'var(--font-heading)' }}>
+                {appLanguage === 'English' ? 'Select Consultation Mode' : 'የውይይት አይነት ይምረጡ'}
+              </h3>
+              <p style={{ margin: '8px 0 0 0', fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                {appLanguage === 'English' 
+                  ? 'Choose how you would like to interact with Divya during this clinical session.' 
+                  : 'በዚህ የሕክምና ክፍለ ጊዜ ከዲቭያ ጋር እንዴት መገናኘት እንደሚፈልጉ ይምረጡ።'}
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <button 
+                onClick={() => { sessionModeModal.onSelect('chat'); setSessionModeModal({ isOpen: false, onSelect: null }); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '16px', padding: '14px 18px', 
+                  background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '14px',
+                  color: 'var(--text)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', width: '100%'
+                }}
+                onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'var(--surface-hover)'; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--surface)'; }}
+              >
+                <span style={{ fontSize: '24px' }}>💬</span>
+                <div>
+                  <strong style={{ display: 'block', fontSize: '14px' }}>{appLanguage === 'English' ? 'Chat Mode (Text-only)' : 'የጽሑፍ ውይይት'}</strong>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{appLanguage === 'English' ? 'Interactive diagnostic messaging' : 'በጽሑፍ መልእክት ብቻ የሚደረግ ምርመራ'}</span>
+                </div>
+              </button>
+
+              <button 
+                onClick={() => { sessionModeModal.onSelect('voice'); setSessionModeModal({ isOpen: false, onSelect: null }); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '16px', padding: '14px 18px', 
+                  background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '14px',
+                  color: 'var(--text)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', width: '100%'
+                }}
+                onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'var(--surface-hover)'; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--surface)'; }}
+              >
+                <span style={{ fontSize: '24px' }}>🎙️</span>
+                <div>
+                  <strong style={{ display: 'block', fontSize: '14px' }}>{appLanguage === 'English' ? 'Voice Mode (Audio-only)' : 'የድምፅ ውይይት'}</strong>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{appLanguage === 'English' ? 'Real-time spoken consultation call' : 'ከዲቭያ ጋር በስልክ ጥሪ የሚደረግ ውይይት'}</span>
+                </div>
+              </button>
+
+              <button 
+                onClick={() => { sessionModeModal.onSelect('hybrid'); setSessionModeModal({ isOpen: false, onSelect: null }); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '16px', padding: '14px 18px', 
+                  background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '14px',
+                  color: 'var(--text)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s', width: '100%'
+                }}
+                onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'var(--surface-hover)'; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--surface)'; }}
+              >
+                <span style={{ fontSize: '24px' }}>🔄</span>
+                <div>
+                  <strong style={{ display: 'block', fontSize: '14px' }}>{appLanguage === 'English' ? 'Hybrid Mode (Chat + Voice)' : 'የተደባለቀ (ጽሑፍ + ድምፅ)'}</strong>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{appLanguage === 'English' ? 'Spoken speech combined with text inputs' : 'በጽሑፍ እየጻፉ በድምፅ ምላሽ ማግኘት'}</span>
+                </div>
+              </button>
+            </div>
+
+            <button 
+              onClick={() => setSessionModeModal({ isOpen: false, onSelect: null })}
+              style={{
+                padding: '10px 0', background: 'transparent', border: 'none', 
+                color: 'var(--text-muted)', cursor: 'pointer', fontSize: '13px', fontWeight: 'bold'
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+            >
+              {appLanguage === 'English' ? 'Cancel' : 'ሰርዝ'}
+            </button>
           </div>
         </div>
       )}
