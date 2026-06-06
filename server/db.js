@@ -2,7 +2,11 @@ const { Pool } = require('pg');
 
 // Safe configuration logging for easy deployment troubleshooting on Render
 if (process.env.DATABASE_URL) {
-  console.log(`[DB-INIT] Detected DATABASE_URL environment variable (length: ${process.env.DATABASE_URL.length}). Attempting pool connection...`);
+  const url = process.env.DATABASE_URL;
+  console.log(`[DB-INIT] Detected DATABASE_URL environment variable (length: ${url.length}). Attempting pool connection...`);
+  if (url.includes('[YOUR-PASSWORD]') || url.includes('<YOUR-PASSWORD>') || url.includes('[password]') || url.includes('<password>') || url.includes('YOUR_DATABASE_PASSWORD') || url.includes('YOUR-PASSWORD')) {
+    console.error('⚠️ [DB-INIT] ERROR: Your DATABASE_URL contains a placeholder (like "[YOUR-PASSWORD]" or "YOUR-PASSWORD"). Please replace it with your actual Supabase database password in Render Environment Variables!');
+  }
 } else {
   console.log('[DB-INIT] DATABASE_URL not found. Falling back to individual parameters:');
   console.log(`  - Host: ${process.env.DB_HOST || 'localhost'}`);
