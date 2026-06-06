@@ -47,12 +47,20 @@ app.post('/api/auth/send-otp', async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 
-    await pool.query(
-      `INSERT INTO health_ai.otps (email, password, otp, expires_at) 
-       VALUES ($1, $2, $3, $4) 
-       ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, otp = EXCLUDED.otp, expires_at = EXCLUDED.expires_at`,
-      [email, password, otp, expiresAt]
-    );
+    try {
+      await pool.query(
+        `INSERT INTO health_ai.otps (email, password, otp, expires_at) 
+         VALUES ($1, $2, $3, $4) 
+         ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, otp = EXCLUDED.otp, expires_at = EXCLUDED.expires_at`,
+        [email, password, otp, expiresAt]
+      );
+    } catch (dbErr) {
+      console.error('Error inserting OTP into database:', dbErr);
+      return res.status(500).json({
+        error: 'Database error generating OTP in Supabase. Check your connection string (DATABASE_URL) and if the database tables are created.',
+        details: dbErr.message
+      });
+    }
 
     const mailOptions = {
       from: `"Divya AI" <${process.env.EMAIL_USER}>`,
@@ -94,7 +102,18 @@ app.post('/api/auth/verify-otp', async (req, res) => {
   }
 
   try {
-    const { rows: otpRows } = await pool.query('SELECT * FROM health_ai.otps WHERE email = $1', [email]);
+    let otpRows;
+    try {
+      const { rows } = await pool.query('SELECT * FROM health_ai.otps WHERE email = $1', [email]);
+      otpRows = rows;
+    } catch (dbErr) {
+      console.error('Database query failed selecting OTP:', dbErr);
+      return res.status(500).json({
+        error: 'Database error fetching OTP from Supabase.',
+        details: dbErr.message
+      });
+    }
+
     if (otpRows.length === 0) {
       return res.status(400).json({ error: 'No verification request found for this email.' });
     }
@@ -109,22 +128,50 @@ app.post('/api/auth/verify-otp', async (req, res) => {
       return res.status(400).json({ error: 'Invalid verification code.' });
     }
 
-    await pool.query('DELETE FROM health_ai.otps WHERE email = $1', [email]);
+    try {
+      await pool.query('DELETE FROM health_ai.otps WHERE email = $1', [email]);
+    } catch (dbErr) {
+      console.error('Database query failed deleting OTP:', dbErr);
+      // Non-fatal, we can still proceed to authenticate
+    }
 
-    const { rows: userRows } = await pool.query('SELECT * FROM health_ai.users WHERE email = $1', [email]);
+    let userRows;
+    try {
+      const { rows } = await pool.query('SELECT * FROM health_ai.users WHERE email = $1', [email]);
+      userRows = rows;
+    } catch (dbErr) {
+      console.error('Database query failed selecting user:', dbErr);
+      return res.status(500).json({
+        error: 'Database error fetching user details from Supabase.',
+        details: dbErr.message
+      });
+    }
+
     let user;
     if (userRows.length === 0) {
       const id = Date.now().toString();
       const name = email.split('@')[0];
-      await pool.query(
-        'INSERT INTO health_ai.users (id, email, password, name) VALUES ($1, $2, $3, $4)',
-        [id, email, password, name]
-      );
+      try {
+        await pool.query(
+          'INSERT INTO health_ai.users (id, email, password, name) VALUES ($1, $2, $3, $4)',
+          [id, email, password, name]
+        );
+      } catch (dbErr) {
+        console.error('Database query failed creating user:', dbErr);
+        return res.status(500).json({
+          error: 'Database error creating new user profile in Supabase.',
+          details: dbErr.message
+        });
+      }
       user = { id, email, name, picture: null };
     } else {
       user = userRows[0];
       if (!user.password) {
-        await pool.query('UPDATE health_ai.users SET password = $1 WHERE email = $2', [password, email]);
+        try {
+          await pool.query('UPDATE health_ai.users SET password = $1 WHERE email = $2', [password, email]);
+        } catch (dbErr) {
+          console.error('Database query failed setting password:', dbErr);
+        }
       } else if (user.password !== password) {
         return res.status(400).json({ error: 'Incorrect password for this email account.' });
       }
