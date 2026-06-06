@@ -170,7 +170,7 @@ export function useGeminiApi({
         ? `Previous conversation:\n${historyText}\n\nThe patient just sent a voice message. First transcribe what they said, then respond as a health assistant in ${targetLangStr} only (or Amharic if they speak/write in Amharic or ask for it). Format your reply EXACTLY like this:\nTRANSCRIPT: [what the patient said]\nRESPONSE: [your health assistant reply in ${targetLangStr} (or Amharic if they speak/write in Amharic or ask for it), 2-3 sentences max]`
         : `The patient just sent a voice message. First transcribe what they said, then respond as a health assistant in ${targetLangStr} only (or Amharic if they speak/write in Amharic or ask for it). Format your reply EXACTLY like this:\nTRANSCRIPT: [what the patient said]\nRESPONSE: [your health assistant reply in ${targetLangStr} (or Amharic if they speak/write in Amharic or ask for it), 2-3 sentences max]`;
 
-      const data = await callGemini(geminiUrl(aiModel || 'gemini-2.5-flash'), {
+      const data = await callGemini(geminiUrl(aiModel || 'gemini-3.5-flash'), {
         contents: [{
           role: 'user',
           parts: [
@@ -442,7 +442,7 @@ Here is what I do:
       }
 
       let data = await callGemini(
-        geminiUrl(aiModel || 'gemini-2.5-flash'),
+        geminiUrl(aiModel || 'gemini-3.5-flash'),
         requestBody,
         abortControllerRef.current?.signal
       );
@@ -494,7 +494,7 @@ Here is what I do:
 
           // Re-call Gemini with updated contents
           data = await callGemini(
-            geminiUrl(aiModel || 'gemini-2.5-flash'),
+            geminiUrl(aiModel || 'gemini-3.5-flash'),
             requestBody,
             abortControllerRef.current?.signal
           );
@@ -549,7 +549,7 @@ Here is what I do:
       const referencesSection = parts.length > 1 ? '\n---\n' + parts.slice(1).join('\n') : '';
 
       const prompt = `You are a professional medical translator. Translate the following text to ${targetLang}. Return ONLY the translated text — no explanations, no extra words.\n\nText: ${textToTranslate}`;
-      const data = await callGemini(geminiUrl(aiModel || 'gemini-2.5-flash'), {
+      const data = await callGemini(geminiUrl(aiModel || 'gemini-3.5-flash'), {
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
       });
       const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
