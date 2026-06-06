@@ -1251,7 +1251,7 @@ function App() {
     callTimeoutRef.current = setTimeout(() => { setCallStatus('speaking'); speak(greeting); }, 1000);
   };
 
-  function startDiagnosticSession(forceNew = false, selectedMode = 'chat') {
+  function startDiagnosticSession(forceNew = false, selectedMode = 'voice') {
     if (!forceNew && unfinishedSessions.length > 0) {
       setShowUnfinishedModal(true);
       return;
@@ -1524,7 +1524,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
     }
   };
 
-  const startRevisionSession = (selectedMode = 'chat') => {
+  const startRevisionSession = (selectedMode = 'voice') => {
     setIsDiagnosticMode(true);
     
     // Build a custom follow-up prompt based on the previous master report assessment
@@ -3420,7 +3420,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               : 'linear-gradient(160deg, rgba(34,34,40,0.98) 0%, rgba(26,28,26,0.99) 100%)',
             backdropFilter: 'blur(40px)',
             border: isDiagnosticMode ? 'none' : `1px solid ${isLightMode ? 'rgba(82,121,111,0.18)' : 'rgba(107,144,128,0.2)'}`,
-            display: 'flex', flexDirection: isDiagnosticMode ? 'row' : 'column',
+            display: 'flex', flexDirection: isDiagnosticMode ? 'row-reverse' : 'column',
             boxShadow: isDiagnosticMode ? 'none' : `0 40px 80px ${isLightMode ? 'rgba(82,121,111,0.12)' : 'rgba(0,0,0,0.7)'}`,
             overflow: 'hidden',
             zIndex: 99999
@@ -3434,7 +3434,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
             display:'flex', flexDirection:'column', color: isLightMode ? 'var(--text)' : '#fff',
             position:'relative', overflow:'hidden',
             padding: '20px 0',
-            borderRight: isDiagnosticMode ? `1px solid ${isLightMode ? 'rgba(195,141,93,0.1)' : 'rgba(212,163,115,0.08)'}` : 'none'
+            borderLeft: isDiagnosticMode ? `1px solid ${isLightMode ? 'rgba(195,141,93,0.1)' : 'rgba(212,163,115,0.08)'}` : 'none'
           }}>
             {!isDiagnosticMode && (
               <div 
@@ -3654,7 +3654,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               </h3>
               
               <div ref={chatAreaRef} onScroll={handleChatScroll} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '20px' }}>
-                {messages.filter(m => m.role !== 'system' && m.role !== 'user').map((msg, index) => {
+                {messages.filter(m => m.role !== 'system').map((msg, index) => {
                   // Separate the main question from choice lines
                   const lines = msg.text.split('\n');
                   const mainTextLines = [];
