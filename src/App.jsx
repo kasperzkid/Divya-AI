@@ -3420,7 +3420,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               : 'linear-gradient(160deg, rgba(34,34,40,0.98) 0%, rgba(26,28,26,0.99) 100%)',
             backdropFilter: 'blur(40px)',
             border: isDiagnosticMode ? 'none' : `1px solid ${isLightMode ? 'rgba(82,121,111,0.18)' : 'rgba(107,144,128,0.2)'}`,
-            display: 'flex', flexDirection: isDiagnosticMode ? 'row-reverse' : 'column',
+            display: 'flex', flexDirection: isDiagnosticMode ? 'row' : 'column',
             boxShadow: isDiagnosticMode ? 'none' : `0 40px 80px ${isLightMode ? 'rgba(82,121,111,0.12)' : 'rgba(0,0,0,0.7)'}`,
             overflow: 'hidden',
             zIndex: 99999
@@ -3434,7 +3434,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
             display:'flex', flexDirection:'column', color: isLightMode ? 'var(--text)' : '#fff',
             position:'relative', overflow:'hidden',
             padding: '20px 0',
-            borderLeft: isDiagnosticMode ? `1px solid ${isLightMode ? 'rgba(195,141,93,0.1)' : 'rgba(212,163,115,0.08)'}` : 'none'
+            borderRight: isDiagnosticMode ? `1px solid ${isLightMode ? 'rgba(195,141,93,0.1)' : 'rgba(212,163,115,0.08)'}` : 'none'
           }}>
             {!isDiagnosticMode && (
               <div 
