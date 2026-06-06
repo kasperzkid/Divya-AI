@@ -43,9 +43,9 @@ app.post('/api/auth/send-otp', async (req, res) => {
 
     await pool.query(
       `INSERT INTO health_ai.otps (email, password, otp, expires_at) 
-       VALUES (?, ?, ?, ?) 
-       ON DUPLICATE KEY UPDATE password = ?, otp = ?, expires_at = ?`,
-      [email, password, otp, expiresAt, password, otp, expiresAt]
+       VALUES ($1, $2, $3, $4) 
+       ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, otp = EXCLUDED.otp, expires_at = EXCLUDED.expires_at`,
+      [email, password, otp, expiresAt]
     );
 
     const mailOptions = {
@@ -88,7 +88,7 @@ app.post('/api/auth/verify-otp', async (req, res) => {
   }
 
   try {
-    const [otpRows] = await pool.query('SELECT * FROM health_ai.otps WHERE email = ?', [email]);
+    const { rows: otpRows } = await pool.query('SELECT * FROM health_ai.otps WHERE email = $1', [email]);
     if (otpRows.length === 0) {
       return res.status(400).json({ error: 'No verification request found for this email.' });
     }
@@ -103,22 +103,22 @@ app.post('/api/auth/verify-otp', async (req, res) => {
       return res.status(400).json({ error: 'Invalid verification code.' });
     }
 
-    await pool.query('DELETE FROM health_ai.otps WHERE email = ?', [email]);
+    await pool.query('DELETE FROM health_ai.otps WHERE email = $1', [email]);
 
-    const [userRows] = await pool.query('SELECT * FROM health_ai.users WHERE email = ?', [email]);
+    const { rows: userRows } = await pool.query('SELECT * FROM health_ai.users WHERE email = $1', [email]);
     let user;
     if (userRows.length === 0) {
       const id = Date.now().toString();
       const name = email.split('@')[0];
       await pool.query(
-        'INSERT INTO health_ai.users (id, email, password, name) VALUES (?, ?, ?, ?)',
+        'INSERT INTO health_ai.users (id, email, password, name) VALUES ($1, $2, $3, $4)',
         [id, email, password, name]
       );
       user = { id, email, name, picture: null };
     } else {
       user = userRows[0];
       if (!user.password) {
-        await pool.query('UPDATE health_ai.users SET password = ? WHERE email = ?', [password, email]);
+        await pool.query('UPDATE health_ai.users SET password = $1 WHERE email = $2', [password, email]);
       } else if (user.password !== password) {
         return res.status(400).json({ error: 'Incorrect password for this email account.' });
       }
@@ -159,16 +159,16 @@ app.post('/api/auth/google', async (req, res) => {
     }
     
     // MySQL: Find or create user
-    const [rows] = await pool.query('SELECT * FROM health_ai.users WHERE email = ?', [email]);
+    const { rows } = await pool.query('SELECT * FROM health_ai.users WHERE email = $1', [email]);
     let user;
     if (rows.length === 0) {
       const id = Date.now().toString();
-      await pool.query('INSERT INTO health_ai.users (id, email, name, picture) VALUES (?, ?, ?, ?)', [id, email, name, picture]);
+      await pool.query('INSERT INTO health_ai.users (id, email, name, picture) VALUES ($1, $2, $3, $4)', [id, email, name, picture]);
       user = { id, email, name, picture };
     } else {
       user = rows[0];
       // Update name/picture if changed
-      await pool.query('UPDATE health_ai.users SET name = ?, picture = ? WHERE email = ?', [name, picture, email]);
+      await pool.query('UPDATE health_ai.users SET name = $1, picture = $2 WHERE email = $3', [name, picture, email]);
     }
     
     const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
@@ -191,11 +191,11 @@ app.post('/api/auth/google', async (req, res) => {
 
       try {
         // MySQL: Find or create user
-        const [rows] = await pool.query('SELECT * FROM health_ai.users WHERE email = ?', [email]);
+        const { rows } = await pool.query('SELECT * FROM health_ai.users WHERE email = $1', [email]);
         let user;
         if (rows.length === 0) {
           const id = 'dev_guest_id';
-          await pool.query('INSERT INTO health_ai.users (id, email, name, picture) VALUES (?, ?, ?, ?)', [id, email, name, picture]);
+          await pool.query('INSERT INTO health_ai.users (id, email, name, picture) VALUES ($1, $2, $3, $4)', [id, email, name, picture]);
           user = { id, email, name, picture };
         } else {
           user = rows[0];
@@ -219,7 +219,7 @@ app.get('/api/user/me', async (req, res) => {
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const [rows] = await pool.query('SELECT * FROM health_ai.users WHERE id = ?', [decoded.userId]);
+    const { rows } = await pool.query('SELECT * FROM health_ai.users WHERE id = $1', [decoded.userId]);
     if (rows.length === 0) return res.status(401).json({ error: 'User not found' });
     res.json({ user: rows[0] });
   } catch (err) {
@@ -244,8 +244,8 @@ const authenticateToken = (req, res, next) => {
 // Sessions Routes
 app.get('/api/sessions', authenticateToken, async (req, res) => {
   try {
-    const [sessions] = await pool.query(
-      'SELECT id, title, DATE_FORMAT(created_at, "%Y-%m-%d") as date FROM health_ai.sessions WHERE user_id = ? ORDER BY created_at DESC',
+    const { rows: sessions } = await pool.query(
+      "SELECT id, title, TO_CHAR(created_at, 'YYYY-MM-DD') as date FROM health_ai.sessions WHERE user_id = $1 ORDER BY created_at DESC",
       [req.userId]
     );
 
@@ -254,8 +254,8 @@ app.get('/api/sessions', authenticateToken, async (req, res) => {
     }
 
     const sessionIds = sessions.map(s => s.id);
-    const [messages] = await pool.query(
-      'SELECT session_id, role, text FROM health_ai.messages WHERE session_id IN (?) ORDER BY id ASC',
+    const { rows: messages } = await pool.query(
+      'SELECT session_id, role, text FROM health_ai.messages WHERE session_id = ANY($1) ORDER BY id ASC',
       [sessionIds]
     );
 
@@ -289,36 +289,42 @@ app.post('/api/sessions', authenticateToken, async (req, res) => {
   let attempt = 0;
 
   while (attempt < maxRetries) {
-    const connection = await pool.getConnection();
+    const connection = await pool.connect();
     try {
-      await connection.beginTransaction();
+      await connection.query('BEGIN');
 
       // 1. Insert or update the session
       await connection.query(
         `INSERT INTO health_ai.sessions (id, user_id, title) 
-         VALUES (?, ?, ?) 
-         ON DUPLICATE KEY UPDATE title = ?`,
-        [id, req.userId, title || 'New Chat', title || 'New Chat']
+         VALUES ($1, $2, $3) 
+         ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title`,
+        [id, req.userId, title || 'New Chat']
       );
 
       // 2. Delete existing messages for this session
       await connection.query(
-        'DELETE FROM health_ai.messages WHERE session_id = ?',
+        'DELETE FROM health_ai.messages WHERE session_id = $1',
         [id]
       );
 
       // 3. Insert new messages
       if (messages && messages.length > 0) {
-        const insertQuery = 'INSERT INTO health_ai.messages (session_id, role, text) VALUES ?';
-        const values = messages.map(m => [id, m.role, m.text]);
-        await connection.query(insertQuery, [values]);
+        const values = [];
+        const valStrings = [];
+        messages.forEach((m, idx) => {
+          const offset = idx * 3;
+          valStrings.push(`($${offset + 1}, $${offset + 2}, $${offset + 3})`);
+          values.push(id, m.role, m.text);
+        });
+        const insertQuery = `INSERT INTO health_ai.messages (session_id, role, text) VALUES ${valStrings.join(', ')}`;
+        await connection.query(insertQuery, values);
       }
 
-      await connection.commit();
+      await connection.query('COMMIT');
       return res.json({ success: true });
     } catch (err) {
-      await connection.rollback();
-      if (err.code === 'ER_LOCK_DEADLOCK' && attempt < maxRetries - 1) {
+      await connection.query('ROLLBACK');
+      if ((err.code === '40001' || err.message?.includes('deadlock')) && attempt < maxRetries - 1) {
         attempt++;
         connection.release();
         // Exponential backoff delay with minor jitter
@@ -337,7 +343,7 @@ app.delete('/api/sessions/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {
     await pool.query(
-      'DELETE FROM health_ai.sessions WHERE id = ? AND user_id = ?',
+      'DELETE FROM health_ai.sessions WHERE id = $1 AND user_id = $2',
       [id, req.userId]
     );
     res.json({ success: true });
@@ -357,7 +363,7 @@ app.post('/api/user/update', async (req, res) => {
     const pAge = age === '' ? null : age;
     const pWeight = weight === '' ? null : weight;
     const pHeight = height === '' ? null : height;
-    await pool.query('UPDATE health_ai.users SET name = ?, age = ?, weight = ?, height = ? WHERE id = ?', [name, pAge, pWeight, pHeight, decoded.userId]);
+    await pool.query('UPDATE health_ai.users SET name = $1, age = $2, weight = $3, height = $4 WHERE id = $5', [name, pAge, pWeight, pHeight, decoded.userId]);
     res.json({ success: true });
   } catch (err) {
     console.error('Update profile error:', err);
@@ -613,7 +619,7 @@ function createMcpServer(userId) {
     async ({ title, description, category, time }) => {
       try {
         await pool.query(
-          'INSERT INTO health_ai.custom_tasks (user_id, title, description, category, time) VALUES (?, ?, ?, ?, ?)',
+          'INSERT INTO health_ai.custom_tasks (user_id, title, description, category, time) VALUES ($1, $2, $3, $4, $5)',
           [userId, title, description || '', category || 'Routine', time || '08:00']
         );
         return {
@@ -759,7 +765,7 @@ app.get('/api/alarms', async (req, res) => {
     } catch (_) {}
   }
   try {
-    const [rows] = await pool.query('SELECT * FROM health_ai.alarms WHERE user_id = ? ORDER BY id DESC', [userId]);
+    const { rows } = await pool.query('SELECT * FROM health_ai.alarms WHERE user_id = $1 ORDER BY id DESC', [userId]);
     res.json({ alarms: rows });
   } catch (err) {
     console.error('Error fetching alarms:', err);
@@ -780,7 +786,7 @@ app.post('/api/alarms', async (req, res) => {
   if (!title || !time) return res.status(400).json({ error: 'Title and time are required' });
   try {
     await pool.query(
-      'INSERT INTO health_ai.alarms (user_id, title, time, days, active) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO health_ai.alarms (user_id, title, time, days, active) VALUES ($1, $2, $3, $4, $5)',
       [userId, title, time, days || 'Everyday', true]
     );
     res.json({ success: true });
@@ -801,7 +807,7 @@ app.delete('/api/alarms/:id', async (req, res) => {
   }
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM health_ai.alarms WHERE id = ? AND user_id = ?', [id, userId]);
+    await pool.query('DELETE FROM health_ai.alarms WHERE id = $1 AND user_id = $2', [id, userId]);
     res.json({ success: true });
   } catch (err) {
     console.error('Error deleting alarm:', err);
@@ -820,7 +826,7 @@ app.get('/api/custom-tasks', async (req, res) => {
     } catch (_) {}
   }
   try {
-    const [rows] = await pool.query('SELECT * FROM health_ai.custom_tasks WHERE user_id = ? ORDER BY id DESC', [userId]);
+    const { rows } = await pool.query('SELECT * FROM health_ai.custom_tasks WHERE user_id = $1 ORDER BY id DESC', [userId]);
     res.json({ tasks: rows });
   } catch (err) {
     console.error('Error fetching custom tasks:', err);
@@ -841,7 +847,7 @@ app.post('/api/custom-tasks', async (req, res) => {
   if (!title) return res.status(400).json({ error: 'Title is required' });
   try {
     await pool.query(
-      'INSERT INTO health_ai.custom_tasks (user_id, title, description, category, time) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO health_ai.custom_tasks (user_id, title, description, category, time) VALUES ($1, $2, $3, $4, $5)',
       [userId, title, description || '', category || 'Routine', time || '08:00']
     );
     res.json({ success: true });
@@ -862,7 +868,7 @@ app.delete('/api/custom-tasks/:id', async (req, res) => {
   }
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM health_ai.custom_tasks WHERE id = ? AND user_id = ?', [id, userId]);
+    await pool.query('DELETE FROM health_ai.custom_tasks WHERE id = $1 AND user_id = $2', [id, userId]);
     res.json({ success: true });
   } catch (err) {
     console.error('Error deleting custom task:', err);
