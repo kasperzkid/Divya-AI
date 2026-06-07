@@ -557,9 +557,9 @@ function App() {
   // Connect/disconnect MCP services dynamically based on settings
   useEffect(() => {
     const handleConnections = async () => {
-      const anyMcpEnabled = settings.mcpGoogleDrive || settings.mcpGoogleCalendar || settings.mcpEmail || settings.mcpGoogleMaps;
+      const anyMcpEnabled = settings.mcpGoogleDrive || settings.mcpGoogleCalendar || settings.mcpEmail;
       if (user && user.id && user.id !== 'guest' && token && anyMcpEnabled) {
-        let url = settings.mcpGoogleMapsUrl || "https://divya-ai-syxr.onrender.com/mcp/updates";
+        let url = settings.mcpGoogleDriveUrl || "https://divya-ai-syxr.onrender.com/mcp/updates";
         if (url.includes("your-api.com") || url.includes("gdrive") || url.includes("calendar") || url.includes("device-alarm") || url.includes("localhost:3001")) {
           url = "https://divya-ai-syxr.onrender.com/mcp/updates";
         }
@@ -576,7 +576,7 @@ function App() {
     };
     
     handleConnections();
-  }, [user, token, settings.mcpGoogleDrive, settings.mcpGoogleCalendar, settings.mcpEmail, settings.mcpGoogleMaps]);
+  }, [user, token, settings.mcpGoogleDrive, settings.mcpGoogleCalendar, settings.mcpEmail]);
   const { personalName, personalAge, personalWeight, personalHeight, isLightMode, isTtsEnabled, appLanguage, aiModel } = settings;
   const setPersonalName = (v) => updateSettings({ personalName: v });
   const setPersonalAge = (v) => updateSettings({ personalAge: v });

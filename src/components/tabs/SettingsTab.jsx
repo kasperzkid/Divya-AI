@@ -712,23 +712,17 @@ export default function SettingsTab({
             {activeConnectingService === 'mcpEmail' && (
               <span style={{ fontSize: '48px' }}>📧</span>
             )}
-            {activeConnectingService === 'mcpGoogleMaps' && (
-              <span style={{ fontSize: '48px' }}>📍</span>
-            )}
 
             <div>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: 'var(--text)' }}>
                 {activeConnectingService === 'mcpEmail' 
                   ? (appLanguage === 'English' ? 'Authorize Email Access' : 'የኢሜል ፈቃድ ጠይቅ')
-                  : activeConnectingService === 'mcpGoogleMaps'
-                  ? (appLanguage === 'English' ? 'Authorize Maps Locator' : 'የካርታ አገልግሎት ፍቃድ ጠይቅ')
                   : (appLanguage === 'English' ? 'Sign in with Google' : 'በ Google ይግቡ')}
               </h3>
               <p style={{ margin: '8px 0 0', fontSize: '12.5px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
                 {activeConnectingService === 'mcpGoogleDrive' && (appLanguage === 'English' ? 'Divya requires access to read & write clinical PDF/CSV health records in your Drive.' : 'ዲቭያ በ Drive ውስጥ የክሊኒካል መዛግብትን ለማስቀመጥ ፈቃድ ይፈልጋል።')}
                 {activeConnectingService === 'mcpGoogleCalendar' && (appLanguage === 'English' ? 'Divya requires access to manage clinical follow-ups and schedules in your Google Calendar.' : 'ዲቭያ በካላንደርዎ ላይ ቀጠሮዎችን ለማቀናጀት ፈቃድ ይፈልጋል።')}
                 {activeConnectingService === 'mcpEmail' && (appLanguage === 'English' ? 'Divya requires permission to dispatch clinical treatment reports and daily wellness plans to your inbox.' : 'ዲቭያ የጤና ሪፖርቶችን እና ዕለታዊ መግለጫዎችን በኢሜልዎ ለመላክ ፍቃድ ይፈልጋል።')}
-                {activeConnectingService === 'mcpGoogleMaps' && (appLanguage === 'English' ? 'Divya requires location permission to search for nearby medical clinics, pharmacies, and specialists.' : 'ዲቭያ በአቅራቢያዎ ያሉ የህክምና ተቋማትን እና ፋርማሲዎችን ለመፈለግ ፍቃድ ይፈልጋል።')}
               </p>
             </div>
 

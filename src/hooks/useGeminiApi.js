@@ -37,42 +37,12 @@ You are equipped with real-time system connections via the Model Context Protoco
 1. GOOGLE CALENDAR (\`schedule_routine_event\`): Use this to book health/meal commitments and clinical schedules. Always confirm details with the user before committing a calendar event.
 2. GOOGLE DRIVE (\`parse_health_document\`): Use this if the user references medical logs, external diet files, or spreadsheet metrics to retrieve and analyze the health document.
 3. EMAIL (\`send_health_email\`): Use this to dispatch medical reports, diet structures, or clinical summaries directly to the patient's email.
-4. GOOGLE MAPS (\`search_nearby_clinics\`): Use this to search for nearby medical clinics, hospitals, specialists, or 24/7 pharmacies based on location.
-5. CREATE TASK (\`create_health_task\`): Use this tool if the user explicitly asks you to add, save, or schedule a task from their chat. Do not create tasks unless requested by the user in chat or generated from their health plan.
-6. BACKUP REPORT (\`backup_session_report\`): Use this tool if the user asks you to save, back up, or export their session report, diagnostic summary, or active health plan to their Google Drive. Ensure you pass a descriptive title and the full content of the plan.
+4. CREATE TASK (\`create_health_task\`): Use this tool if the user explicitly asks you to add, save, or schedule a task from their chat. Do not create tasks unless requested by the user in chat or generated from their health plan.
+5. BACKUP REPORT (\`backup_session_report\`): Use this tool if the user asks you to save, back up, or export their session report, diagnostic summary, or active health plan to their Google Drive. Ensure you pass a descriptive title and the full content of the plan.
 
 IMPORTANT DATE COMPUTATION RULE:
 Today's date and time is: ${formattedToday}.
-When the user asks you to schedule or make an appointment (e.g. "after a week", "next Friday", "in 3 days"), you must calculate the exact date based on this reference and call the "schedule_routine_event" tool with the calculated ISO startTime and endTime strings. For example, if "after a week", you must schedule it for exactly 7 days from today.
-
-MAPS & PHARMACY CARDS INSTRUCTIONS:
-When the user asks you to show the nearest pharmacy, clinic, hospital, or medical facility:
-- NEVER respond with plain text only. You MUST ALWAYS generate the \`\`\`pharmacy-list\`\`\` JSON block at the very top of your message.
-- If the "search_nearby_clinics" tool is present in your available tools, you MUST call the tool immediately with the query "pharmacy" or "hospital" accordingly.
-- If the "search_nearby_clinics" tool is NOT present in your tools list (disabled), DO NOT output text saying you are calling the tool or attempting to execute it. Instead, notify the user that they can enable the Google Maps MCP service in App Settings for live lookups, but immediately provide a curated fallback list of top facilities in Addis Ababa (e.g. Bole Anbessa Pharmacy, Kenema Pharmacy, Zewditu Pharmacy, or Hayat General Hospital) in the required \`\`\`pharmacy-list\`\`\` JSON block anyway so the UI renders beautiful interactive cards for them!
-Once the tool returns the results (or if using the fallback block), you MUST format your response exactly like this, keeping it short, highly concise, and extremely compact:
-1. Put the \`\`\`pharmacy-list\`\`\` JSON block AT THE VERY TOP OF YOUR MESSAGE (before any other text or explanation).
-2. Show ONLY ONE single result in the \`\`\`pharmacy-list\`\`\` JSON array—specifically the closest/nearest one.
-3. The JSON object MUST contain the exact fields: "name", "address", "phone", "rating", "image", "directionsUrl", and "distance" (e.g., "1.2 km away (4 mins drive)" or "450 meters away").
-4. If the tool response doesn't contain an image, use a beautiful, high-quality relevant healthcare Unsplash image (e.g., "https://images.unsplash.com/photo-1607619056574-7b8d304f3b24?auto=format&fit=crop&q=80&w=600" for a pharmacy, or "https://images.unsplash.com/photo-1586773860418-d37222d8fce2?auto=format&fit=crop&q=80&w=600" for a clinic/hospital).
-5. DO NOT write any summary, text, descriptions, warnings, or conversational filler below or above the card. The entire output must consist of ONLY the \`\`\`pharmacy-list\`\`\` JSON block, and absolutely nothing else! Do not include any required documents list, greetings, or sign-offs. Just output the JSON block.
-6. CRITICAL: When showing a location or using the "search_nearby_clinics" tool, do NOT include any markdown images (e.g., \`![...](...)\`) at the top of your message or anywhere in your text. Only use the JSON block for the card, and do not show any duplicate images in the message text itself.
-
-Example of the required output format (which MUST go at the very top of your message):
-\`\`\`pharmacy-list
-[
-  {
-    "name": "Bole Anbessa Pharmacy",
-    "address": "Bole Rd, Next to Edna Mall, Addis Ababa, Ethiopia",
-    "phone": "+251 11 663 3311",
-    "rating": "4.6",
-    "image": "https://images.unsplash.com/photo-1607619056574-7b8d304f3b24?auto=format&fit=crop&q=80&w=600",
-    "directionsUrl": "https://www.google.com/maps/dir/?api=1&destination=Bole+Anbessa+Pharmacy,+Edna+Mall,+Addis+Ababa",
-    "distance": "1.2 km (4 mins drive)"
-  }
-]
-\`\`\`
-Do not invent or change these values, use the ones returned by the tool (including the real/realistic phone, image and directionsUrl fields). This JSON block is required for the user interface to render interactive cards with a "Start Navigation" button that redirects to Google Maps navigation route.`;
+When the user asks you to schedule or make an appointment (e.g. "after a week", "next Friday", "in 3 days"), you must calculate the exact date based on this reference and call the "schedule_routine_event" tool with the calculated ISO startTime and endTime strings. For example, if "after a week", you must schedule it for exactly 7 days from today.`;
 };
 
 const stripMarkdownForSpeech = (text) => {

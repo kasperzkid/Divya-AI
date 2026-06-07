@@ -368,42 +368,6 @@ export default function ActionTab({
 
         {/* Action Buttons Panel */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-          
-          {/* 1. Google Maps Action for Pharmacies */}
-          {isPharmacy && (
-            <button
-              disabled={status['search_nearby_clinics'] === 'loading'}
-              onClick={() => triggerMcpAction(task.id, 'search_nearby_clinics', { location: currentLoc, query: 'pharmacy' })}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px', borderRadius: '8px', 
-                background: 'rgba(16, 185, 129, 0.06)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.15)',
-                fontSize: '12px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => { if (status['search_nearby_clinics'] !== 'loading') e.currentTarget.style.background = 'rgba(16, 185, 129, 0.12)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(16, 185, 129, 0.06)'; }}
-            >
-              <MapPin size={14} />
-              {status['search_nearby_clinics'] === 'loading' ? t.searching : `${t.searchButton}`}
-            </button>
-          )}
-
-          {/* 2. Google Maps Action for Hospitals/Appointments */}
-          {isAppointment && (
-            <button
-              disabled={status['search_nearby_clinics'] === 'loading'}
-              onClick={() => triggerMcpAction(task.id, 'search_nearby_clinics', { location: currentLoc, query: 'hospital' })}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px', borderRadius: '8px', 
-                background: 'rgba(99, 102, 241, 0.06)', color: '#6366f1', border: '1px solid rgba(99, 102, 241, 0.15)',
-                fontSize: '12px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => { if (status['search_nearby_clinics'] !== 'loading') e.currentTarget.style.background = 'rgba(99, 102, 241, 0.12)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(99, 102, 241, 0.06)'; }}
-            >
-              <MapPin size={14} />
-              {status['search_nearby_clinics'] === 'loading' ? t.searching : `${t.searchButton}`}
-            </button>
-          )}
 
           {/* 3. Google Calendar Action */}
           {isAppointment && (

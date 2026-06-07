@@ -61,47 +61,7 @@ mcpServer.tool(
   }
 );
 
-/* ==========================================
-   TOOL 4: GOOGLE MAPS CLINIC SEARCH
-   ========================================== */
-mcpServer.tool(
-  "search_nearby_clinics",
-  {
-    location: z.string().optional().default("Addis Ababa").describe("The city or area to search in (default is Addis Ababa)"),
-    query: z.string().describe("Type of medical facility, e.g., 'clinic', 'hospital', 'pharmacy'")
-  },
-  async ({ location, query }) => {
-    // Generate beautiful and contextual clinical location results
-    const results = [
-      {
-        name: "Tikur Anbessa Specialized Hospital",
-        address: "Zewditu St, Addis Ababa, Ethiopia",
-        rating: "4.5",
-        mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Tikur Anbessa Hospital " + location)}`
-      },
-      {
-        name: "Hayat General Hospital",
-        address: "Bole Area, Addis Ababa, Ethiopia",
-        rating: "4.2",
-        mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Hayat Hospital " + location)}`
-      },
-      {
-        name: "Landmark General Hospital",
-        address: "Mexico Area, Addis Ababa, Ethiopia",
-        rating: "4.4",
-        mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Landmark Hospital " + location)}`
-      }
-    ];
 
-    return {
-      content: [{ 
-        type: "text", 
-        text: `SUCCESS: Found medical locations matching "${query}" in ${location}:\n\n` + 
-              results.map((r, i) => `${i+1}. ${r.name}\n   📍 Address: ${r.address}\n   ⭐ Rating: ${r.rating}\n   🗺️ Maps Link: ${r.mapsLink}`).join("\n\n")
-      }]
-    };
-  }
-);
 
 /* ==========================================
    TOOL 5: CREATE HEALTH TASK
