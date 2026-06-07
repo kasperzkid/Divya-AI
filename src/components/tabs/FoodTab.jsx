@@ -116,6 +116,17 @@ const calculateMealStatus = (id) => {
 };
 
 export default function FoodTab({ masterReport, isLightMode, appLanguage, setHasUncheckedActiveMeal, startDiagnosticSession }) {
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth <= 768;
+  const isTablet = windowWidth <= 1024;
+
   const hasReport = masterReport?.messages?.some(
     (m) => m.role === 'ai' && (m.text.includes('ASSESSMENT:') || m.text.includes('TEMPORARY RELIEF:'))
   );
@@ -729,7 +740,7 @@ export default function FoodTab({ masterReport, isLightMode, appLanguage, setHas
 
   return (
     <div className="sample-page" style={{ 
-      padding: '24px 32px', 
+      padding: isMobile ? '16px' : '24px 32px', 
       textAlign: 'left', 
       display: 'flex', 
       flexDirection: 'column', 
@@ -796,7 +807,7 @@ export default function FoodTab({ masterReport, isLightMode, appLanguage, setHas
       {/* SECTION 1: TOP SPLIT GRID - MACROS ON LEFT, AI SUGGESTED NUTRIENTS ON RIGHT */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1.2fr 1fr',
+        gridTemplateColumns: isTablet ? '1fr' : '1.2fr 1fr',
         gap: '24px',
         alignItems: 'stretch',
         flexWrap: 'wrap'
@@ -811,9 +822,9 @@ export default function FoodTab({ masterReport, isLightMode, appLanguage, setHas
 
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: '1.1fr 1fr', 
+            gridTemplateColumns: isMobile ? '1fr' : '1.1fr 1fr', 
             gap: '16px',
-            minHeight: '340px',
+            minHeight: isMobile ? 'auto' : '340px',
             height: '100%'
           }}>
             {/* SUB-LEFT: Carbohydrates (tall card) */}
@@ -985,10 +996,10 @@ export default function FoodTab({ masterReport, isLightMode, appLanguage, setHas
 
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
             gap: '16px',
             height: '100%',
-            minHeight: '340px'
+            minHeight: isMobile ? 'auto' : '340px'
           }}>
             {suggestedNutrients.map((nut) => {
               const stepMap = { vitA: 50, vitC: 10, iron: 1, magnesium: 20 };
@@ -1069,7 +1080,7 @@ export default function FoodTab({ masterReport, isLightMode, appLanguage, setHas
       {/* SECTION 2: BOTTOM FLEX SPLIT - TODAY'S FOOD LOG VS FOOD & VEGETABLE */}
       <div style={{ 
         display: 'flex', 
-        flexDirection: 'row', 
+        flexDirection: isTablet ? 'column' : 'row', 
         flexWrap: 'wrap',
         gap: '24px',
         width: '100%'

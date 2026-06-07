@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   Plus, ChevronRight, CheckCheck, Activity, Apple, Brain, HeartPulse, Moon, Stethoscope, Sparkles, RefreshCcw
 } from 'lucide-react';
@@ -23,6 +24,13 @@ export default function PlanTab({
   regeneratePlanTasks,
   startDiagnosticSession,
 }) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const hasReport = masterReport?.messages?.some(
     (m) => m.role === 'ai' && (m.text.includes('ASSESSMENT:') || m.text.includes('TEMPORARY RELIEF:'))
   );
@@ -399,21 +407,21 @@ export default function PlanTab({
   const hasRecoveryPlan = allPlanTasks.length > 0;
 
   return (
-    <div className="sample-page" style={{ padding: '24px 32px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', overflowY: 'auto' }}>
+    <div className="sample-page" style={{ padding: isMobile ? '16px 12px' : '24px 32px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '24px', height: '100%', overflowY: 'auto' }}>
       
       {/* Responsive Layout container */}
       <div style={{
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: isMobile ? 'column' : 'row',
         flexWrap: 'wrap',
-        gap: '30px',
+        gap: isMobile ? '20px' : '30px',
         width: '100%',
         alignItems: 'flex-start',
         justifyContent: 'center'
       }}>
         
         {/* Left Column: Weekly Strip, Categories & Today's Plan */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', flex: '1.4 1 450px', maxWidth: '750px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: isMobile ? '1 1 100%' : '1.4 1 450px', maxWidth: isMobile ? 'none' : '750px', width: '100%' }}>
           
           {/* 1. Daily Plan Header */}
           <div style={{
@@ -422,9 +430,10 @@ export default function PlanTab({
               : 'linear-gradient(135deg, rgba(107, 144, 128, 0.03), rgba(255, 255, 255, 0.02))',
             border: `1px solid ${isLightMode ? 'rgba(82,121,111,0.15)' : 'rgba(255,255,255,0.06)'}`,
             borderRadius: '20px',
-            padding: '24px',
+            padding: isMobile ? '16px' : '24px',
             display: 'flex',
-            alignItems: 'center',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center',
             justifyContent: 'space-between',
             gap: '16px',
             boxShadow: '0 8px 30px rgba(0,0,0,0.02)'
@@ -601,7 +610,7 @@ export default function PlanTab({
                               animation: 'fadeIn 0.2s ease'
                             }}>
                               {/* Layout with Illustration and Clinical Insights */}
-                              <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '16px' }}>
+                              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '16px', alignItems: isMobile ? 'flex-start' : 'center', marginTop: '16px' }}>
                                 {/* Inline Vector Image/Illustration */}
                                 <div style={{ flexShrink: 0, width: '60px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                   {details.iconSvg}
@@ -698,10 +707,11 @@ export default function PlanTab({
             ? 'linear-gradient(to bottom, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.02) 100%)' 
             : 'linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.015) 100%)',
           margin: '0 10px',
+          display: isMobile ? 'none' : 'block'
         }} className="plan-vertical-divider" />
 
         {/* Right Side: WeeklyProgress, Streaks & Upcoming Plan Preview */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', flex: '1 1 320px', maxWidth: '480px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', flex: isMobile ? '1 1 100%' : '1 1 320px', maxWidth: isMobile ? 'none' : '480px', width: '100%' }}>
           
           {/* 4. Weekly Progress Strip Section */}
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
