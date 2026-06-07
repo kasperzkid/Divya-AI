@@ -626,7 +626,7 @@ function createMcpServer(userId) {
           address: `Bole Rd, Next to Edna Mall, ${location}, Ethiopia`,
           phone: "+251 11 663 3311",
           rating: "4.6",
-          image: "https://images.unsplash.com/photo-1607619056574-7b8d304f3b24?auto=format&fit=crop&q=80&w=400",
+          image: "https://static-maps.yandex.ru/1.x/?ll=38.7852,8.9984&z=16&l=map&size=450,200&pt=38.7852,8.9984,pm2rdl",
           mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Bole Anbessa Pharmacy " + location)}`,
           directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent("Bole Anbessa Pharmacy, Edna Mall, " + location)}`
         },
@@ -635,7 +635,7 @@ function createMcpServer(userId) {
           address: `Piazza, King George VI St, ${location}, Ethiopia`,
           phone: "+251 11 155 2288",
           rating: "4.4",
-          image: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&q=80&w=400",
+          image: "https://static-maps.yandex.ru/1.x/?ll=38.7529,9.0306&z=16&l=map&size=450,200&pt=38.7529,9.0306,pm2rdl",
           mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Kenema Pharmacy " + location)}`,
           directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent("Kenema Pharmacy 1, Piazza, " + location)}`
         },
@@ -644,7 +644,7 @@ function createMcpServer(userId) {
           address: `Zewditu Memorial Hospital Ground, ${location}, Ethiopia`,
           phone: "+251 11 551 8085",
           rating: "4.5",
-          image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=400",
+          image: "https://static-maps.yandex.ru/1.x/?ll=38.7619,9.0194&z=16&l=map&size=450,200&pt=38.7619,9.0194,pm2rdl",
           mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Zewditu Pharmacy " + location)}`,
           directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent("Zewditu Memorial Hospital, " + location)}`
         }
@@ -654,7 +654,7 @@ function createMcpServer(userId) {
           address: `Zewditu St, ${location}, Ethiopia`,
           phone: "+251 11 551 1211",
           rating: "4.5",
-          image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=400",
+          image: "https://static-maps.yandex.ru/1.x/?ll=38.7512,9.0152&z=16&l=map&size=450,200&pt=38.7512,9.0152,pm2rdl",
           mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Tikur Anbessa Hospital " + location)}`,
           directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent("Tikur Anbessa Hospital, Zewditu St, " + location)}`
         },
@@ -663,7 +663,7 @@ function createMcpServer(userId) {
           address: `Bole Area, ${location}, Ethiopia`,
           phone: "+251 11 662 4488",
           rating: "4.2",
-          image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&q=80&w=400",
+          image: "https://static-maps.yandex.ru/1.x/?ll=38.7811,9.0016&z=16&l=map&size=450,200&pt=38.7811,9.0016,pm2rdl",
           mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Hayat Hospital " + location)}`,
           directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent("Hayat General Hospital, Bole, " + location)}`
         },
@@ -672,7 +672,7 @@ function createMcpServer(userId) {
           address: `Mexico Area, ${location}, Ethiopia`,
           phone: "+251 11 552 5466",
           rating: "4.4",
-          image: "https://images.unsplash.com/photo-1512678080530-7760d81faba6?auto=format&fit=crop&q=80&w=400",
+          image: "https://static-maps.yandex.ru/1.x/?ll=38.7456,9.0089&z=16&l=map&size=450,200&pt=38.7456,9.0089,pm2rdl",
           mapsLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Landmark Hospital " + location)}`,
           directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent("Landmark Hospital, Mexico, " + location)}`
         }
@@ -720,9 +720,7 @@ function createMcpServer(userId) {
                   // Generate realistic rating from coordinates
                   const rating = (4.0 + (Math.abs(elem.lat * 100 + elem.lon * 100) % 10) * 0.1).toFixed(1);
                   
-                  const img = isPharmacy
-                    ? "https://images.unsplash.com/photo-1607619056574-7b8d304f3b24?auto=format&fit=crop&q=80&w=400"
-                    : "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=400";
+                  const img = `https://static-maps.yandex.ru/1.x/?ll=${elem.lon},${elem.lat}&z=16&l=map&size=450,200&pt=${elem.lon},${elem.lat},pm2rdl`;
                   
                   return {
                     name: elemName,
