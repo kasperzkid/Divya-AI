@@ -3828,3 +3828,93 @@ body.light-mode .master-report-card {
   50% { opacity: 1; transform: scale(1.1); }
   100% { opacity: 0.2; transform: scale(0.9); }
 }
+
+/* 📺 TV and Large Desktop Screens Responsive Optimization */
+@media (min-width: 1400px) {
+  .welcome-container {
+    max-width: 1200px !important;
+    padding-top: 140px;
+  }
+  .input-area-wrapper {
+    max-width: 780px !important;
+  }
+  .prompt-card {
+    max-width: 290px !important;
+  }
+}
+
+@media (min-width: 1920px) {
+  .welcome-container {
+    max-width: 1400px !important;
+    padding-top: 180px;
+  }
+  .welcome-title {
+    font-size: 46px !important;
+  }
+  .welcome-subtitle {
+    font-size: 18px !important;
+    margin-bottom: 40px !important;
+  }
+  .prompt-cards-container {
+    gap: 24px !important;
+    margin-top: 60px !important;
+  }
+  .prompt-card {
+    max-width: 340px !important;
+    padding: 32px !important;
+    border-radius: 16px !important;
+  }
+  .prompt-card h3 {
+    font-size: 18px !important;
+  }
+  .prompt-card p {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+  }
+  .prompt-card .card-icon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .input-area-wrapper {
+    max-width: 900px !important;
+    margin-top: 40px !important;
+  }
+}
+
+@media (min-width: 2500px) {
+  .welcome-container {
+    max-width: 1800px !important;
+    padding-top: 240px;
+  }
+  .welcome-title {
+    font-size: 56px !important;
+  }
+  .welcome-subtitle {
+    font-size: 22px !important;
+    margin-bottom: 56px !important;
+  }
+  .prompt-cards-container {
+    gap: 32px !important;
+  }
+  .prompt-card {
+    max-width: 420px !important;
+    padding: 40px !important;
+    border-radius: 24px !important;
+  }
+  .prompt-card h3 {
+    font-size: 22px !important;
+  }
+  .prompt-card p {
+    font-size: 16px !important;
+  }
+  .input-area-wrapper {
+    max-width: 1100px !important;
+  }
+  .input-bar {
+    border-radius: 28px !important;
+    padding: 8px !important;
+  }
+  .input-placeholder {
+    font-size: 18px !important;
+  }
+}
