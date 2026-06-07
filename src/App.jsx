@@ -5,7 +5,7 @@ import {
   Stethoscope, HeartPulse, X, MessageSquare, Sun, Moon, Send, Volume2, VolumeX,
   Languages, Settings, Share2, Calendar, Apple, Phone, PhoneOff, FileText,
   Camera, Image, Clipboard, MicOff, AudioLines, Minus, Copy, CheckCheck,
-  User, Shield, Info, Palette, Lock, Globe, ChevronRight, RefreshCcw, WifiOff, Save, LogIn, LogOut, ChevronDown, Pencil, Brain, Eye, EyeOff, Trash2
+  User, Shield, Info, Palette, Lock, Globe, ChevronRight, RefreshCcw, WifiOff, Save, LogIn, LogOut, ChevronDown, Pencil, Brain, Eye, EyeOff, Trash2, BookOpen
 } from 'lucide-react'
 
 import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
@@ -28,6 +28,7 @@ import PlanTab              from './components/tabs/PlanTab'
 import FoodTab              from './components/tabs/FoodTab'
 import AnalyticsTab         from './components/tabs/AnalyticsTab'
 import SettingsTab          from './components/tabs/SettingsTab'
+import HowItWorksTab        from './components/tabs/HowItWorksTab'
 import DivyaAvatar3D        from './components/DivyaAvatar3D'
 import { parseClinicalReport, cleanItemText, getDiagnosticReportData } from './utils/clinicalParser'
 import { mcpManager } from './utils/mcpManager'
@@ -832,22 +833,31 @@ function App() {
     loadData();
   }, [user, token]);
 
-  // Save user-specific chats to local storage AND database
+  // Save user-specific chats to local storage AND database (debounced to avoid database and connection flooding)
   useEffect(() => {
+    let timer = null;
     if (isInitialLoadRef.current && user && chats.length > 0) {
       localStorage.setItem(`chats_${user.id}`, JSON.stringify(chats));
       
       const activeChat = chats.find(c => c.id === currentChatId);
       if (activeChat && activeChat.messages && activeChat.messages.length > 0 && activeChat.id !== `master_report_${user.id}` && activeChat.id !== `plan_data_${user.id}`) {
-        axios.post('/api/sessions', {
-          id: activeChat.id,
-          title: activeChat.title,
-          messages: activeChat.messages
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        }).catch(err => console.error('Error saving session to DB:', err));
+        timer = setTimeout(() => {
+          axios.post('/api/sessions', {
+            id: activeChat.id,
+            title: activeChat.title,
+            messages: activeChat.messages
+          }, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(err => console.error('Error saving session to DB:', err));
+        }, 2000); // 2 seconds debounce to prevent concurrent transaction lock & connection flooding
       }
     }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
   }, [chats, user, currentChatId, token]);
 
   // Save user-specific master reports to database and local storage
@@ -2607,6 +2617,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
             { id: 'plan', icon: <Calendar size={18} />, label: 'Plan', locked: !user },
             { id: 'food', icon: <Apple size={18} />, label: 'Food & Nutrition', locked: !user },
             { id: 'analytics', icon: <Activity size={18} />, label: 'Analytics', locked: !user },
+            { id: 'howitworks', icon: <BookOpen size={18} />, label: appLanguage === 'English' ? 'How It Works' : 'እንዴት እንደሚሰራ' },
             { id: 'settings', icon: <Settings size={18} />, label: 'Settings', locked: !user }
           ].map(item => (
             <button
@@ -2924,6 +2935,10 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
             customPlanTasks={customPlanTasks}
             startDiagnosticSession={startDiagnosticSession}
           />
+        )}
+
+        {activeTab === 'howitworks' && (
+          <HowItWorksTab appLanguage={appLanguage} />
         )}
 
         {/* ── Settings tab ── */}
