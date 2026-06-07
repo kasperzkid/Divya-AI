@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { GEMINI_API_KEY, TTS_MODEL, USE_BEARER_AUTH } from '../config';
 
 /**
@@ -9,6 +9,15 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
   const activeAudioRef = useRef(null);
   const [isSpeaking, setIsSpeaking]       = useState(false);
   const [speakingMsgId, setSpeakingMsgId] = useState(null);
+
+  const isMutedRef = useRef(isMuted);
+
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+    if (isMuted) {
+      stopSpeaking();
+    }
+  }, [isMuted]);
   const [isGeneratingVoice, setIsGeneratingVoice] = useState(false);
 
   /** Choose a Gemini voice based on language */
@@ -89,7 +98,7 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
 
   const speak = async (text, msgId = null) => {
     if (!text?.trim()) return;
-    if (isMuted) {
+    if (isMutedRef.current) {
       setIsSpeaking(false);
       setIsGeneratingVoice(false);
       setSpeakingMsgId(null);
@@ -150,20 +159,24 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
         }
       );
 
+      if (isMutedRef.current) return;
       if (!res.ok) throw new Error(`TTS HTTP ${res.status}`);
       const data = await res.json();
+      if (isMutedRef.current) return;
       const part = data.candidates?.[0]?.content?.parts?.[0]?.inlineData;
 
       if (part?.data) {
         if (isIntro) {
           localStorage.setItem('divya_intro_audio_cache', part.data);
         }
+        if (isMutedRef.current) return;
         setIsGeneratingVoice(false);
         setIsSpeaking(true);
         await playBase64Audio(part.data, part.mimeType);
       } else {
         // Gemini returned something unexpected — fall back to browser TTS
         console.warn('Gemini TTS returned no audio data, using browser TTS');
+        if (isMutedRef.current) return;
         setIsGeneratingVoice(false);
         setIsSpeaking(true);
         await speakWithBrowser(text, appLanguage);
@@ -174,6 +187,7 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
         console.warn('Gemini TTS failed, falling back to browser TTS:', err.message);
         // Graceful fallback to browser Web Speech API
         try { 
+          if (isMutedRef.current) return;
           setIsGeneratingVoice(false);
           setIsSpeaking(true);
           await speakWithBrowser(text, appLanguage); 
