@@ -3004,7 +3004,8 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               <div className="messages-area" ref={chatAreaRef} onScroll={handleChatScroll}>
                 {messages.map((msg, index) => {
                   const { body, references, images } = msg.role === 'ai' ? parseReferences(msg.text) : { body: msg.text, references: [], images: [] };
-                  const lines = body.split('\n');
+                  const normalizedBody = body.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n');
+                  const lines = normalizedBody.split('\n');
                   const mainTextLines = [];
                   const choiceLines = [];
                   lines.forEach(line => {

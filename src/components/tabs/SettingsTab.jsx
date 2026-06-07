@@ -389,12 +389,15 @@ export default function SettingsTab({
                     cursor: 'pointer'
                   }}
                 >
-                  <option value="gemini-2.5-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.5 Flash (Default/Recommended)</option>
-                  <option value="gemini-2.5-pro" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.5 Pro (Deep Clinical Reasoning)</option>
-                  <option value="gemini-2.0-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.0 Flash (Fast Response)</option>
+                  <option value="gemini-3.5-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 3.5 Flash (Default/Recommended)</option>
+                  <option value="gemini-3.5-pro" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 3.5 Pro (Ultimate Clinical Intelligence)</option>
+                  <option value="gemini-3.1-pro" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 3.1 Pro (Deep Clinical Reasoning)</option>
+                  <option value="gemini-2.5-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.5 Flash</option>
+                  <option value="gemini-2.5-pro" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.5 Pro</option>
+                  <option value="gemini-2.0-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.0 Flash</option>
                   <option value="gemini-2.0-pro-exp-02-05" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.0 Pro Experimental</option>
                   <option value="gemini-2.0-flash-thinking-exp-01-21" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 2.0 Flash Thinking Experimental</option>
-                  <option value="gemini-1.5-pro" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 1.5 Pro (Expert Diagnostics)</option>
+                  <option value="gemini-1.5-pro" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 1.5 Pro</option>
                   <option value="gemini-1.5-flash" style={{ background: isLightMode ? '#ffffff' : '#1e242b', color: isLightMode ? '#1a202c' : '#ffffff' }}>Gemini 1.5 Flash</option>
                 </select>
               </div>
