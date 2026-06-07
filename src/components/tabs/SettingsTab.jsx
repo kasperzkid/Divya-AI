@@ -58,9 +58,9 @@ export default function SettingsTab({
 
       // Find URL from settings, fallback or override if it contains old sample URL
       const urlKey = `${serviceName}Url`;
-      let url = settings[urlKey] || "http://localhost:3001/mcp/updates";
-      if (url.includes("your-api.com") || url.includes("gdrive") || url.includes("calendar") || url.includes("device-alarm")) {
-        url = "http://localhost:3001/mcp/updates";
+      let url = settings[urlKey] || "https://divya-ai-syxr.onrender.com/mcp/updates";
+      if (url.includes("your-api.com") || url.includes("gdrive") || url.includes("calendar") || url.includes("device-alarm") || url.includes("localhost:3001")) {
+        url = "https://divya-ai-syxr.onrender.com/mcp/updates";
       }
       const connectionUrl = `${url}?userId=${uId}`;
 

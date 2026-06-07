@@ -567,7 +567,7 @@ function App() {
       if (isAnyMcpEnabled) {
         // Connect straight to our unified self-hosted gateway endpoint ONLY if not already connected
         if (!mcpManager.clients["unified-gateway"]) {
-          const gatewayUrl = `http://localhost:3001/mcp/updates?userId=${uId}`;
+          const gatewayUrl = `https://divya-ai-syxr.onrender.com/mcp/updates?userId=${uId}`;
           try {
             await mcpManager.connectService("unified-gateway", gatewayUrl);
           } catch (e) {
