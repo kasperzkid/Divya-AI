@@ -3918,3 +3918,18 @@ body.light-mode .master-report-card {
     font-size: 18px !important;
   }
 }
+
+/* 🎙️ Voice Controls Layout on Mobile view */
+.voice-controls-row {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  padding: 0 20px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .voice-controls-row {
+    gap: 12px !important;
+  }
+}

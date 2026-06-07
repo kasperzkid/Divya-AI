@@ -3536,7 +3536,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
 
             {/* Middle Controls — Warm Minimal */}
             <div style={{display:'flex', alignItems:'flex-end', justifyContent:'center', paddingBottom: isDiagnosticMode ? '10vh' : '40px', zIndex:1, width:'100%'}}>
-              <div style={{display:'flex', gap:'30px', justifyContent:'center', padding:'0 20px', alignItems: 'center'}}>
+              <div className="voice-controls-row">
                 
                 {/* Mute/Unmute Voice Button */}
                 <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:'16px'}}>
