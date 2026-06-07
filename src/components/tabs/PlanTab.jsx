@@ -416,6 +416,8 @@ export default function PlanTab({
         flexWrap: 'wrap',
         gap: isMobile ? '20px' : '30px',
         width: '100%',
+        maxWidth: '1360px',
+        margin: '0 auto',
         alignItems: 'flex-start',
         justifyContent: 'flex-start'
       }}>

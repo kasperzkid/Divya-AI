@@ -2646,9 +2646,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
 
         <div className="sidebar-nav">
           {[
+            { id: 'chat', icon: <MessageSquare size={18} />, label: appLanguage === 'English' ? 'Chat' : 'ውይይት' },
             { id: 'sessions', icon: <ClipboardList size={18} />, label: appLanguage === 'English' ? 'Sessions' : 'ክፍለ ጊዜዎች', locked: !user },
             { id: 'plan', icon: <Calendar size={18} />, label: appLanguage === 'English' ? 'Plan' : 'ዕቅድ', locked: !user },
-            { id: 'chat', icon: <MessageSquare size={18} />, label: appLanguage === 'English' ? 'Chat' : 'ውይይት' },
             { id: 'food', icon: <Apple size={18} />, label: appLanguage === 'English' ? 'Food & Nutrition' : 'አመጋገብ እና ስነ-ምግብ', locked: !user },
             { id: 'analytics', icon: <Activity size={18} />, label: appLanguage === 'English' ? 'Analytics' : 'ትንታኔ', locked: !user },
             { id: 'howitworks', icon: <BookOpen size={18} />, label: appLanguage === 'English' ? 'How It Works' : 'እንዴት እንደሚሰራ' },

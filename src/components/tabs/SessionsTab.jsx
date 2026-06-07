@@ -91,48 +91,49 @@ export default function SessionsTab({
     };
 
     let htmlContent = `
-      <!-- Top Decorative Bar -->
-      <div style="height: 6px; background: linear-gradient(90deg, #52796f, #84a98c); margin: -40px -50px 30px -50px;"></div>
+      <!-- Top Primary Accent Bar (Stripe/Stanford Style) -->
+      <div style="height: 8px; background: #354f52; margin: -40px -50px 30px -50px;"></div>
       
-      <!-- Medical Institute Header -->
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px;">
+      <!-- Corporate Medical Header -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 24px;">
         <div>
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-            <span style="font-size: 24px;">🩺</span>
-            <span style="font-size: 20px; font-weight: 800; color: #354f52; letter-spacing: 0.5px;">DIVYA CLINICAL HEALTH INSTITUTE</span>
+          <div style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; line-height: 1.1;">
+            DIVYA CLINICAL HEALTH INTELLIGENCE
           </div>
-          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #52796f; font-weight: 700;">
-            Autonomous Artificial Intelligence Diagnostics Core
+          <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #52796f; font-weight: 700; margin-top: 4px;">
+            Autonomous Diagnostics Core & Medical Analytics
           </div>
         </div>
-        <div style="text-align: right;">
-          <div style="background: #e6f0ed; color: #354f52; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 6px; border: 1px solid rgba(82, 121, 111, 0.15);">
-            ${isEnglish ? 'OFFICIAL DIAGNOSTIC RECORD' : 'ክሊኒካዊ የምርመራ ሪፖርት'}
+        <div style="text-align: right; line-height: 1.3;">
+          <div style="font-size: 9px; font-weight: 800; letter-spacing: 1px; color: #ffffff; background: #0f172a; padding: 3px 10px; border-radius: 2px; display: inline-block; margin-bottom: 6px; text-transform: uppercase;">
+            ${isEnglish ? 'OFFICIAL CLINICAL RECORD' : 'ክሊኒካዊ የምርመራ ሪፖርት'}
           </div>
-          <div style="font-family: monospace; font-size: 12px; color: #64748b; font-weight: 600;">${reportRefId}</div>
+          <div style="font-family: monospace; font-size: 11px; color: #475569; font-weight: 700;">${reportRefId}</div>
         </div>
       </div>
 
-      <!-- Metadata Fields -->
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; display: flex; gap: 40px; margin-bottom: 30px; font-size: 13px; color: #475569;">
-        <div>
-          <strong>${isEnglish ? 'Issued By:' : 'የተዘጋጀው በ:'}</strong>
-          <span style="color: #1e293b; font-weight: 600; margin-left: 6px;">Divya Medical AI (v1.0)</span>
-        </div>
-        <div>
-          <strong>${isEnglish ? 'Date Generated:' : 'ቀን:'}</strong>
-          <span style="color: #1e293b; font-weight: 600; margin-left: 6px;">${formattedDate}</span>
-        </div>
-        <div>
-          <strong>${isEnglish ? 'Classification:' : 'ምደባ:'}</strong>
-          <span style="color: #0d9488; font-weight: 700; margin-left: 6px; letter-spacing: 0.5px;">${isEnglish ? 'CONFIDENTIAL' : 'ሚስጥራዊ'}</span>
-        </div>
-      </div>
+      <!-- Professional Metadata Grid (2 Columns, Bounded) -->
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 12px; color: #334155; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 4px;">
+        <tr>
+          <td style="padding: 12px 16px; border-right: 1px solid #e2e8f0; width: 33%;">
+            <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; display: block; margin-bottom: 2px;">ISSUING SYSTEM</span>
+            <strong style="color: #0f172a;">Divya AI (v1.0.0-PRO)</strong>
+          </td>
+          <td style="padding: 12px 16px; border-right: 1px solid #e2e8f0; width: 33%;">
+            <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; display: block; margin-bottom: 2px;">DATE GENERATED</span>
+            <strong style="color: #0f172a;">${formattedDate}</strong>
+          </td>
+          <td style="padding: 12px 16px; width: 34%;">
+            <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; display: block; margin-bottom: 2px;">CLASSIFICATION</span>
+            <strong style="color: #0f9488; letter-spacing: 0.5px;">CONFIDENTIAL / SECURE</strong>
+          </td>
+        </tr>
+      </table>
     `;
 
     if (reportData.opening) {
       htmlContent += `
-        <div style="font-size: 14.5px; font-style: italic; color: #334155; border-left: 4px solid #52796f; padding-left: 18px; margin-bottom: 30px; line-height: 1.6;">
+        <div style="font-size: 13.5px; font-style: italic; color: #334155; line-height: 1.6; margin-bottom: 24px; padding: 14px 20px; background: #fdfdfd; border-left: 3px solid #354f52; border-radius: 0 4px 4px 0;">
           ${reportData.opening.replace(/\*\*/g, '').replace(/\*/g, '').trim()}
         </div>
       `;
@@ -140,19 +141,16 @@ export default function SessionsTab({
 
     if (reportData.assessment) {
       const formattedAssessment = reportData.assessment
-        .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1e293b; font-weight: 700;">$1</strong>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #0f172a; font-weight: 700;">$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/\n/g, '<br/>');
 
       htmlContent += `
-        <div style="background: linear-gradient(135deg, rgba(82, 121, 111, 0.04), rgba(132, 169, 140, 0.08)); border: 1px solid rgba(82, 121, 111, 0.15); border-radius: 16px; padding: 24px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.015);">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-            <span style="font-size: 18px;">🧠</span>
-            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
-              ${isEnglish ? 'Clinical Impression' : 'ክሊኒካዊ ግምገማ'}
-            </h4>
+        <div style="margin-bottom: 28px;">
+          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; border-bottom: 1px solid #0f172a; padding-bottom: 6px; margin-bottom: 12px;">
+            ${isEnglish ? 'SECTION I: CLINICAL ASSESSMENT & IMPRESSION' : 'ክፍል 1: ክሊኒካዊ ግምገማ እና ግንዛቤ'}
           </div>
-          <div style="color: #334155; font-size: 14px; line-height: 1.7; word-wrap: break-word;">
+          <div style="color: #334155; font-size: 13px; line-height: 1.7; word-wrap: break-word; text-align: justify; padding: 4px 0;">
             ${formattedAssessment}
           </div>
         </div>
@@ -161,14 +159,11 @@ export default function SessionsTab({
 
     if (reportData.relief.length > 0) {
       htmlContent += `
-        <div style="margin-bottom: 30px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-            <span style="font-size: 18px;">❤️</span>
-            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
-              ${isEnglish ? 'Temporary Relief Suggestions' : 'ጊዜያዊ ማስታገሻ ምክሮች'}
-            </h4>
+        <div style="margin-bottom: 28px;">
+          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; border-bottom: 1px solid #0f172a; padding-bottom: 6px; margin-bottom: 14px;">
+            ${isEnglish ? 'SECTION II: RECOMMENDED RELIEF PROTOCOLS' : 'ክፍል 2: የሚመከሩ የጊዜያዊ ማስታገሻ መመሪያዎች'}
           </div>
-          <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
       `;
 
       reportData.relief.forEach((rawItem) => {
@@ -176,16 +171,18 @@ export default function SessionsTab({
         let displayMsg = formatBold(cleanText.replace(/^[\s*\-\d\.\•]+\s*/, ''));
         if (displayMsg) {
           htmlContent += `
-            <div style="background: #fafaf9; border: 1px solid #f1f1ee; border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; gap: 12px; align-items: flex-start;">
-                <span style="color: #52796f; font-weight: bold; font-size: 16px; line-height: 1;">✓</span>
-                <div style="color: #334155; font-size: 13.5px; line-height: 1.6; flex: 1;">
-                  ${displayMsg}
-                </div>
-              </div>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 16px;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="vertical-align: top; width: 15px; color: #52796f; font-weight: 900; font-size: 14px; padding-top: 1px;">•</td>
+                  <td style="color: #334155; font-size: 13px; line-height: 1.5; padding-left: 8px;">
+                    ${displayMsg}
+                  </td>
+                </tr>
+              </table>
               ${imageUrl ? `
-                <div style="border-radius: 8px; overflow: hidden; border: 1px solid #e5e5e0; margin-top: 6px;">
-                  <img src="${imageUrl}" alt="${imageAlt || 'Relief step'}" style="width: 100%; max-height: 220px; object-fit: cover; display: block;" />
+                <div style="border-radius: 4px; overflow: hidden; border: 1px solid #e2e8f0; margin-top: 8px; max-width: 450px;">
+                  <img src="${imageUrl}" alt="${imageAlt || 'Relief step'}" style="width: 100%; max-height: 180px; object-fit: cover; display: block;" />
                 </div>
               ` : ''}
             </div>
@@ -201,14 +198,11 @@ export default function SessionsTab({
 
     if (reportData.tests.length > 0) {
       htmlContent += `
-        <div style="margin-bottom: 30px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-            <span style="font-size: 18px;">🔬</span>
-            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
-              ${isEnglish ? 'Recommended Diagnostic Tests' : 'የሚመከሩ የላብራቶሪ ምርመራዎች'}
-            </h4>
+        <div style="margin-bottom: 28px;">
+          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; border-bottom: 1px solid #0f172a; padding-bottom: 6px; margin-bottom: 14px;">
+            ${isEnglish ? 'SECTION III: LABORATORY & DIAGNOSTIC DIRECTIVES' : 'ክፍል 3: የሚመከሩ የላብራቶሪ እና ምርመራ መመሪያዎች'}
           </div>
-          <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
       `;
 
       reportData.tests.forEach((rawItem) => {
@@ -218,14 +212,14 @@ export default function SessionsTab({
         
         if (displayMsg) {
           htmlContent += `
-            <div style="background: #fafaf9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; gap: 16px;">
-              <div style="display: flex; gap: 12px; align-items: flex-start; flex: 1;">
-                <span style="color: #52796f; font-weight: bold; font-size: 16px; line-height: 1;">→</span>
-                <div style="color: #334155; font-size: 13.5px; line-height: 1.6;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 16px;">
+              <div style="display: flex; gap: 8px; align-items: flex-start; flex: 1;">
+                <span style="color: #475569; font-weight: 900; font-size: 12px; padding-top: 1px;">•</span>
+                <div style="color: #334155; font-size: 13px; line-height: 1.5; padding-left: 4px;">
                   ${displayMsg}
                 </div>
               </div>
-              <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 20px; color: ${parsed.priorityColor}; background: ${parsed.priorityBg}; border: 1px solid rgba(0,0,0,0.02); white-space: nowrap;">
+              <span style="font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 2px; color: ${parsed.priorityColor}; background: ${parsed.priorityBg}; border: 1px solid ${parsed.priorityColor}40; white-space: nowrap;">
                 ${parsed.priorityText}
               </span>
             </div>
@@ -241,23 +235,23 @@ export default function SessionsTab({
 
     if (reportData.warningSigns.length > 0) {
       htmlContent += `
-        <div style="margin-bottom: 30px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-            <span style="font-size: 18px;">🚨</span>
-            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #b91c1c;">
-              ${isEnglish ? 'Critical Warning Signs (Seek Immediate Care)' : 'ወዲያውኑ የህክምና እርዳታ የሚያስፈልጋቸው ምልክቶች'}
-            </h4>
+        <div style="margin-bottom: 28px;">
+          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #b91c1c; border-bottom: 1px solid #b91c1c; padding-bottom: 6px; margin-bottom: 14px;">
+            ${isEnglish ? 'SECTION IV: EMERGENCY MONITORING & CRITICAL SYMPTOMS' : 'ክፍል 4: ወዲያውኑ የህክምና እርዳታ የሚያስፈልጋቸው ምልክቶች'}
           </div>
-          <div style="border: 1px solid rgba(239, 68, 68, 0.2); background: #fef2f2; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="border: 1px solid #fca5a5; background: #fff5f5; border-radius: 4px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="font-size: 11px; font-weight: 800; color: #991b1b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+              CRITICAL NOTICE: SEEK IMMEDIATE MEDICAL ATTENTION IF ANY OF THE FOLLOWING OCCUR
+            </div>
       `;
 
       reportData.warningSigns.forEach((rawItem) => {
         let displayMsg = formatBold(rawItem.replace(/^[\s*\-\d\.\•]+\s*/, ''));
         if (displayMsg) {
           htmlContent += `
-            <div style="display: flex; gap: 12px; align-items: flex-start;">
-              <span style="color: #ef4444; font-size: 14px; margin-top: 1px;">⚠️</span>
-              <div style="color: #991b1b; font-size: 13.5px; font-weight: 600; line-height: 1.5;">
+            <div style="display: flex; gap: 8px; align-items: flex-start;">
+              <span style="color: #ef4444; font-size: 12px; line-height: 1;">■</span>
+              <div style="color: #991b1b; font-size: 12.5px; font-weight: 600; line-height: 1.5; padding-left: 4px;">
                 ${displayMsg}
               </div>
             </div>
@@ -281,27 +275,32 @@ export default function SessionsTab({
 
     if (parsedKeyTerms.length > 0) {
       htmlContent += `
-        <div style="margin-bottom: 30px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
-            <span style="font-size: 18px;">📖</span>
-            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
-              ${isEnglish ? 'Medical Glossary & Key Terms' : 'የህክምና ቃላት መፍቻ'}
-            </h4>
+        <div style="margin-bottom: 28px;">
+          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; border-bottom: 1px solid #0f172a; padding-bottom: 6px; margin-bottom: 14px;">
+            ${isEnglish ? 'SECTION V: GLOSSARY OF CLINICAL TERMINOLOGY' : 'ክፍል 5: የህክምና ቃላት መፍቻ'}
           </div>
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #e2e8f0;">
+            <thead>
+              <tr style="background: #f1f5f9; border-bottom: 1px solid #cbd5e1; text-align: left;">
+                <th style="padding: 10px 14px; font-weight: 800; color: #475569; width: 30%;">TERM</th>
+                <th style="padding: 10px 14px; font-weight: 800; color: #475569; width: 70%;">CLINICAL DEFINITION</th>
+              </tr>
+            </thead>
+            <tbody>
       `;
 
       parsedKeyTerms.forEach((item) => {
         htmlContent += `
-          <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 2px;">
-            <strong style="color: #334155; font-size: 13.5px; display: block; margin-bottom: 4px;">${item.term}</strong>
-            <span style="color: #64748b; font-size: 13px; line-height: 1.5; display: block;">${item.definition}</span>
-          </div>
+          <tr style="border-bottom: 1px solid #e2e8f0; background: #ffffff;">
+            <td style="padding: 10px 14px; font-weight: 700; color: #0f172a; vertical-align: top;">${item.term}</td>
+            <td style="padding: 10px 14px; color: #475569; line-height: 1.5; vertical-align: top;">${item.definition}</td>
+          </tr>
         `;
       });
 
       htmlContent += `
-          </div>
+            </tbody>
+          </table>
         </div>
       `;
     }
@@ -317,21 +316,18 @@ export default function SessionsTab({
 
     if (parsedReferences.length > 0) {
       htmlContent += `
-        <div style="margin-bottom: 35px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-            <span style="font-size: 18px;">📚</span>
-            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
-              ${isEnglish ? 'Clinical Research References' : 'ክሊኒካዊ ዋቢዎች'}
-            </h4>
+        <div style="margin-bottom: 32px;">
+          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; border-bottom: 1px solid #0f172a; padding-bottom: 6px; margin-bottom: 12px;">
+            ${isEnglish ? 'SECTION VI: BIBLIOGRAPHY & MEDICAL CITATIONS' : 'ክፍል 6: ክሊኒካዊ ዋቢዎች'}
           </div>
-          <ol style="margin: 0; padding-left: 20px; font-size: 13px; color: #475569; display: flex; flex-direction: column; gap: 8px; line-height: 1.5;">
+          <ol style="margin: 0; padding-left: 18px; font-size: 12.5px; color: #475569; display: flex; flex-direction: column; gap: 6px; line-height: 1.5;">
       `;
 
       parsedReferences.forEach((ref) => {
         htmlContent += `
-          <li>
-            <span style="font-weight: 600; color: #334155;">${ref.label}</span>
-            ${ref.url && ref.url !== '#' ? `<br/><span style="font-size: 11px; color: #0d9488; word-break: break-all;">${ref.url}</span>` : ''}
+          <li style="margin-bottom: 4px;">
+            <span style="font-weight: 600; color: #0f172a;">${ref.label}</span>
+            ${ref.url && ref.url !== '#' ? `<br/><span style="font-size: 10.5px; color: #0d9488; font-family: monospace; word-break: break-all;">${ref.url}</span>` : ''}
           </li>
         `;
       });
@@ -344,17 +340,21 @@ export default function SessionsTab({
 
     if (reportData.disclaimer) {
       htmlContent += `
-        <div style="border-top: 1px dashed #cbd5e1; margin-top: 40px; padding-top: 24px; text-align: center;">
-          <div style="font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
-            ⚠️ ${isEnglish ? 'Medical Disclaimer' : 'የህክምና ማስጠንቀቂያ'}
+        <div style="border-top: 1px dashed #cbd5e1; margin-top: 40px; padding-top: 20px; text-align: center;">
+          <div style="font-size: 10px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;">
+            LEGAL MEDICAL DISCLAIMER & LIMITATION
           </div>
-          <div style="font-size: 11.5px; color: #94a3b8; font-style: italic; line-height: 1.6; max-width: 680px; margin: 0 auto 24px auto;">
+          <div style="font-size: 11px; color: #94a3b8; font-style: italic; line-height: 1.6; max-width: 660px; margin: 0 auto 20px auto; text-align: justify;">
             ${reportData.disclaimer.replace(/^⚠️\s*/, '')}
           </div>
-          <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 6px; font-size: 11px; color: #64748b;">
-            <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Digitally Signed & Certified</div>
-            <div style="font-family: monospace; font-size: 10px; color: #94a3b8; padding: 4px 12px; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 4px;">
-              Divya clinical-engine-signature::${reportRefId.split('-').pop()}
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 10px; color: #64748b; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+            <div style="text-align: left; line-height: 1.4;">
+              <span style="text-transform: uppercase; font-weight: 800; color: #475569; display: block; font-size: 9px; letter-spacing: 0.5px;">SECURITY ENCRYPTION SEAL</span>
+              <span style="font-family: monospace; color: #94a3b8; font-size: 9.5px;">DIVYA-CLINICAL-SECURE-ID::${reportRefId.split('-').pop()}</span>
+            </div>
+            <div style="text-align: right; line-height: 1.4;">
+              <span style="text-transform: uppercase; font-weight: 800; color: #475569; display: block; font-size: 9px; letter-spacing: 0.5px;">DIGITAL VERIFICATION</span>
+              <strong style="color: #354f52; font-family: monospace; font-size: 10px;">Divya Clinical Engine Core</strong>
             </div>
           </div>
         </div>
@@ -441,6 +441,8 @@ export default function SessionsTab({
           flexWrap: 'wrap',
           gap: '32px',
           width: '100%',
+          maxWidth: '1360px',
+          margin: '0 auto',
           alignItems: 'flex-start',
           justifyContent: 'flex-start'
         }}>
