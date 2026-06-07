@@ -628,6 +628,12 @@ function App() {
     return greetings[Math.floor(Math.random() * greetings.length)];
   }, [appLanguage]);
 
+  const isReportGenerated = useMemo(() => {
+    return messages.some(m => 
+      m.role === 'ai' && (/ASSESSMENT|TEMPORARY\s+RELIEF|🔍\s*ASSESSMENT|💊\s*TEMPORARY\s+RELIEF/i.test(m.text))
+    );
+  }, [messages]);
+
   const handlePointerDown = (e) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     dragRef.current = {
@@ -3843,83 +3849,114 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               )}
 
               {/* Voice and Chat Place for Short Answers */}
-              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${isLightMode ? 'rgba(195,141,93,0.12)' : 'rgba(212,163,115,0.1)'}`, display: 'flex', gap: '12px', flexShrink: 0, alignItems: 'center' }}>
-                <button 
-                  onMouseDown={(e) => { e.preventDefault(); if (user) { setIsListening(true); startListening(); } else triggerLoginPrompt('use Voice Input'); }} 
-                  onMouseUp={(e) => { e.preventDefault(); stopListening(); setIsListening(false); }}
-                  onMouseLeave={(e) => { e.preventDefault(); if (isListening) { stopListening(); setIsListening(false); } }}
-                  disabled={isThinking || isSpeaking}
-                  style={{
-                    background: isListening 
-                      ? (isLightMode ? '#2f3e46' : '#d4a373')
-                      : (isLightMode ? 'rgba(47,62,70,0.06)' : 'rgba(212,163,115,0.08)'),
-                    border: isListening ? 'none' : `1px solid ${isLightMode ? 'rgba(47,62,70,0.12)' : 'rgba(212,163,115,0.15)'}`,
-                    borderRadius: '50%', width: '48px', height: '48px', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: isListening 
-                      ? (isLightMode ? '#fefae0' : '#1a1612')
-                      : (isLightMode ? '#2f3e46' : '#d4a373'),
-                    cursor: isThinking || isSpeaking ? 'not-allowed' : 'pointer', 
-                    transition: 'all 0.2s', flexShrink: 0
-                  }}
-                  title={appLanguage === 'English' ? "Hold to speak" : "ለመናገር ተጭነው ይያዙ"}
-                >
-                  <Mic size={20} />
-                </button>
-                <input 
-                  type="text" 
-                  value={inputText}
-                  onChange={e => setInputText(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && inputText.trim()) { e.preventDefault(); handleTextSubmit(inputText); } }}
-                  placeholder={appLanguage === 'English' ? "Type a short answer..." : "አጭር መልስ ይጻፉ..."}
-                  style={{ 
-                    flex: 1, 
-                    background: isLightMode ? 'rgba(47,62,70,0.04)' : 'rgba(212,163,115,0.06)', 
-                    border: `1px solid ${isLightMode ? 'rgba(47,62,70,0.1)' : 'rgba(212,163,115,0.12)'}`, 
-                    borderRadius: '12px', padding: '12px 16px', 
-                    color: isLightMode ? '#2f3e46' : '#fefae0', 
-                    outline: 'none' 
-                  }}
-                  disabled={isThinking || isSpeaking}
-                />
-                <button 
-                  onClick={() => handleTextSubmit(inputText)}
-                  disabled={!inputText.trim() || isThinking || isSpeaking}
-                  style={{ 
-                    background: inputText.trim() && !isThinking && !isSpeaking 
-                      ? 'var(--accent)' 
-                      : (isLightMode ? 'rgba(47,62,70,0.06)' : 'rgba(212,163,115,0.08)'),
-                    border: 'none', 
-                    borderRadius: '50%', 
-                    width: '44px', 
-                    height: '44px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    color: inputText.trim() && !isThinking && !isSpeaking 
-                      ? '#ffffff' 
-                      : (isLightMode ? 'rgba(47,62,70,0.3)' : 'rgba(212,163,115,0.3)'),
-                    cursor: inputText.trim() && !isThinking && !isSpeaking ? 'pointer' : 'not-allowed', 
-                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                    boxShadow: inputText.trim() && !isThinking && !isSpeaking ? '0 4px 12px rgba(107, 144, 128, 0.25)' : 'none',
-                    flexShrink: 0
-                  }}
-                  onMouseEnter={e => {
-                    if (inputText.trim() && !isThinking && !isSpeaking) {
-                      e.currentTarget.style.background = 'var(--accent-light)';
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (inputText.trim() && !isThinking && !isSpeaking) {
-                      e.currentTarget.style.background = 'var(--accent)';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }
-                  }}
-                >
-                  <Send size={16} />
-                </button>
-              </div>
+              {isReportGenerated ? (
+                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${isLightMode ? 'rgba(195,141,93,0.12)' : 'rgba(212,163,115,0.1)'}`, display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0, width: '100%' }}>
+                  <button
+                    onClick={endCall}
+                    className="read-report-btn"
+                    style={{
+                      width: '100%',
+                      padding: '14px 20px',
+                      borderRadius: '12px',
+                      fontSize: '15px',
+                      fontWeight: '700',
+                      textTransform: 'none',
+                      background: 'linear-gradient(135deg, var(--accent), var(--accent-light))',
+                      color: '#ffffff',
+                      boxShadow: '0 8px 24px rgba(107, 144, 128, 0.35)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      gap: '8px',
+                      border: 'none',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 12px 30px rgba(107, 144, 128, 0.45)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(107, 144, 128, 0.35)'; }}
+                  >
+                    <span>{appLanguage === 'English' ? 'You can Leave' : 'ውይይቱን ጨርሰው መውጣት ይችላሉ (Leave)'}</span>
+                  </button>
+                </div>
+              ) : (
+                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${isLightMode ? 'rgba(195,141,93,0.12)' : 'rgba(212,163,115,0.1)'}`, display: 'flex', gap: '12px', flexShrink: 0, alignItems: 'center' }}>
+                  <button 
+                    onMouseDown={(e) => { e.preventDefault(); if (user) { setIsListening(true); startListening(); } else triggerLoginPrompt('use Voice Input'); }} 
+                    onMouseUp={(e) => { e.preventDefault(); stopListening(); setIsListening(false); }}
+                    onMouseLeave={(e) => { e.preventDefault(); if (isListening) { stopListening(); setIsListening(false); } }}
+                    disabled={isThinking || isSpeaking}
+                    style={{
+                      background: isListening 
+                        ? (isLightMode ? '#2f3e46' : '#d4a373')
+                        : (isLightMode ? 'rgba(47,62,70,0.06)' : 'rgba(212,163,115,0.08)'),
+                      border: isListening ? 'none' : `1px solid ${isLightMode ? 'rgba(47,62,70,0.12)' : 'rgba(212,163,115,0.15)'}`,
+                      borderRadius: '50%', width: '48px', height: '48px', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: isListening 
+                        ? (isLightMode ? '#fefae0' : '#1a1612')
+                        : (isLightMode ? '#2f3e46' : '#d4a373'),
+                      cursor: isThinking || isSpeaking ? 'not-allowed' : 'pointer', 
+                      transition: 'all 0.2s', flexShrink: 0
+                    }}
+                    title={appLanguage === 'English' ? "Hold to speak" : "ለመናገር ተጭነው ይያዙ"}
+                  >
+                    <Mic size={20} />
+                  </button>
+                  <input 
+                    type="text" 
+                    value={inputText}
+                    onChange={e => setInputText(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && inputText.trim()) { e.preventDefault(); handleTextSubmit(inputText); } }}
+                    placeholder={appLanguage === 'English' ? "Type a short answer..." : "አጭር መልስ ይጻፉ..."}
+                    style={{ 
+                      flex: 1, 
+                      background: isLightMode ? 'rgba(47,62,70,0.04)' : 'rgba(212,163,115,0.06)', 
+                      border: `1px solid ${isLightMode ? 'rgba(47,62,70,0.1)' : 'rgba(212,163,115,0.12)'}`, 
+                      borderRadius: '12px', padding: '12px 16px', 
+                      color: isLightMode ? '#2f3e46' : '#fefae0', 
+                      outline: 'none' 
+                    }}
+                    disabled={isThinking || isSpeaking}
+                  />
+                  <button 
+                    onClick={() => handleTextSubmit(inputText)}
+                    disabled={!inputText.trim() || isThinking || isSpeaking}
+                    style={{ 
+                      background: inputText.trim() && !isThinking && !isSpeaking 
+                        ? 'var(--accent)' 
+                        : (isLightMode ? 'rgba(47,62,70,0.06)' : 'rgba(212,163,115,0.08)'),
+                      border: 'none', 
+                      borderRadius: '50%', 
+                      width: '44px', 
+                      height: '44px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      color: inputText.trim() && !isThinking && !isSpeaking 
+                        ? '#ffffff' 
+                        : (isLightMode ? 'rgba(47,62,70,0.3)' : 'rgba(212,163,115,0.3)'),
+                      cursor: inputText.trim() && !isThinking && !isSpeaking ? 'pointer' : 'not-allowed', 
+                      transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                      boxShadow: inputText.trim() && !isThinking && !isSpeaking ? '0 4px 12px rgba(107, 144, 128, 0.25)' : 'none',
+                      flexShrink: 0
+                    }}
+                    onMouseEnter={e => {
+                      if (inputText.trim() && !isThinking && !isSpeaking) {
+                        e.currentTarget.style.background = 'var(--accent-light)';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (inputText.trim() && !isThinking && !isSpeaking) {
+                        e.currentTarget.style.background = 'var(--accent)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }
+                    }}
+                  >
+                    <Send size={16} />
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
