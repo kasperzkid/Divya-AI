@@ -508,75 +508,77 @@ export default function SettingsTab({
 
 
         {activeSettingsTab === 'HowItWorks' && (
-          <div className="settings-card-premium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: isMobile ? '16px' : '32px', width: '100%', maxWidth: '800px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-            <h3 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '8px', color: 'var(--text)', fontFamily: 'var(--font-heading)' }}>
-              {appLanguage === 'English' ? 'How It Works — Divya AI Guide' : 'እንዴት እንደሚሰራ — የዲቭያ AI መመሪያ'}
-            </h3>
-            <p style={{ margin: '0 0 24px 0', fontSize: '13.5px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-              {appLanguage === 'English' 
-                ? 'Welcome to Divya AI! Our platform serves as your bilingual personal health assistant and clinical companion. It evaluates symptoms, tracks traditional nutrition, sets reminders, and maps local medical clinics.'
-                : 'ወደ ዲቭያ AI እንኳን ደህና መጡ! ይህ መድረክ እንደ ግል የጤና ረዳትዎ እና ክሊኒካዊ ባለሙያዎ ሆኖ ያገለግላል። ምልክቶችን ይገመግማል፣ አመጋገብን ይከታተላል፣ አስታዋሾችን ያዘጋጃል እንዲሁም የህክምና ተቋማትን ይጠቁማል።'}
-            </p>
+          <div style={{ width: '100%', maxWidth: 'none', padding: '0', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div>
+              <h3 style={{ fontSize: '22px', fontWeight: '800', marginBottom: '8px', color: 'var(--text)', fontFamily: 'var(--font-heading)' }}>
+                {appLanguage === 'English' ? 'How It Works — Divya AI Guide' : 'እንዴት እንደሚሰራ — የዲቭያ AI መመሪያ'}
+              </h3>
+              <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                {appLanguage === 'English' 
+                  ? 'Welcome to Divya AI! Our platform serves as your bilingual personal health assistant and clinical companion. It evaluates symptoms, tracks traditional nutrition, sets reminders, and maps local medical clinics.'
+                  : 'ወደ ዲቭያ AI እንኳን ደህና መጡ! ይህ መድረክ እንደ ግል የጤና ረዳትዎ እና ክሊኒካዊ ባለሙያዎ ሆኖ ያገለግላል። ምልክቶችን ይገመግማል፣ አመጋገብን ይከታተላል፣ አስታዋሾችን ያዘጋጃል እንዲሁም የህክምና ተቋማትን ይጠቁማል።'}
+              </p>
+            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              {/* Row 1: Plan Mode (Left) and Session Mode (Right) */}
-              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '24px', alignItems: 'stretch' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+              {/* Part 1: Plan Mode & Session Mode */}
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '32px', alignItems: 'stretch' }}>
                 
-                {/* Plan Mode (Left) */}
-                <div style={{ flex: 1, background: isLightMode ? 'rgba(0,0,0,0.015)' : 'rgba(255,255,255,0.015)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <img src="https://i.postimg.cc/mr2gwnBB/plan-mode.png" alt="Plan Mode" style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px' }} />
+                {/* Plan Mode (Left Column) */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <img src="https://i.postimg.cc/mr2gwnBB/plan-mode.png" alt="Plan Mode" style={{ width: '100%', height: isMobile ? '200px' : '260px', objectFit: 'cover', borderRadius: '16px' }} />
                   <div>
-                    <strong style={{ display: 'block', fontSize: '14px', color: 'var(--text)', marginBottom: '6px' }}>
-                      {appLanguage === 'English' ? '📋 Plan Mode' : '📋 የእቅድ ሁኔታ (Plan Mode)'}
-                    </strong>
-                    <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '800', color: 'var(--text)' }}>
+                      {appLanguage === 'English' ? '📋 1. Plan Mode — Organizing Daily Recovery Routines' : '📋 1. የእቅድ ሁኔታ (Plan Mode) — የእለት ተእለት ማገገሚያ ተግባራትን ማደራጀት'}
+                    </h4>
+                    <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                       {appLanguage === 'English' 
-                        ? 'Plan Mode builds customized daily recovery guidelines. It tracks clinical tasks (e.g. diagnostic tests, pill dosages, and stretches) and syncs physical checkup routines to ensure a consistent, health-conscious lifestyle.'
-                        : 'የማገገሚያ እቅድ ሁኔታ (Plan Mode) በየቀኑ የሚከናወኑ ተግባራትን ያዘጋጃል። ክሊኒካዊ ቀጠሮዎችን፣ መድሃኒቶችን እና ልምምዶችን በመከታተል የተስተካከለ እና ጤናማ የኑሮ ዘይቤ እንዲኖርዎት ይረዳል።'}
+                        ? 'Plan Mode builds customized daily recovery guidelines. It tracks clinical tasks (such as hospital diagnostic tests, prescribed pill dosages, and specialized stretching exercises) and syncs physical checkup routines to ensure a consistent, highly disciplined, and health-conscious lifestyle.'
+                        : 'የእቅድ ሁኔታ (Plan Mode) በየቀኑ የሚከናወኑ ተግባራትን ያዘጋጃል። ክሊኒካዊ ቀጠሮዎችን፣ የታዘዙ መድሃኒቶችን እና ልምምዶችን በመከታተል የተስተካከለ፣ የተገደበ እና ጤናማ የኑሮ ዘይቤ እንዲኖርዎት ይረዳል።'}
                     </p>
                   </div>
                 </div>
 
-                {/* Session Mode (Right) */}
-                <div style={{ flex: 1, background: isLightMode ? 'rgba(0,0,0,0.015)' : 'rgba(255,255,255,0.015)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <img src="https://i.postimg.cc/1t3sGV0S/session-mode.png" alt="Session Mode" style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px' }} />
+                {/* Session Mode (Right Column) */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <img src="https://i.postimg.cc/1t3sGV0S/session-mode.png" alt="Session Mode" style={{ width: '100%', height: isMobile ? '200px' : '260px', objectFit: 'cover', borderRadius: '16px' }} />
                   <div>
-                    <strong style={{ display: 'block', fontSize: '14px', color: 'var(--text)', marginBottom: '6px' }}>
-                      {appLanguage === 'English' ? '💬 Diagnostic Session' : '💬 የምርመራ ውይይት (Session Mode)'}
-                    </strong>
-                    <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '800', color: 'var(--text)' }}>
+                      {appLanguage === 'English' ? '💬 2. Diagnostic Session — Evaluating Symptoms Step-by-Step' : '💬 2. የምርመራ ውይይት (Session Mode) — ምልክቶችን ደረጃ በደረጃ መገምገም'}
+                    </h4>
+                    <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                       {appLanguage === 'English' 
-                        ? 'Divya asks step-by-step diagnostic questions. She investigates pain locations (Head, Chest, Stomach, Back, Joints, or Other), checks pain types, duration, severity, and associated health history to compile an assessment.'
-                        : 'ዲቭያ ደረጃ በደረጃ ጥያቄዎችን ትጠይቃለች። የህመሙን ቦታ (ራስ፣ ደረት፣ ሆድ፣ ጀርባ፣ መገጣጠሚያዎች ወይም ሌላ)፣ የህመሙን አይነት፣ የቆይታ ጊዜን፣ የህመም ደረጃን እና የቀደመ የጤና ታሪክዎን ትገመግማለች።'}
+                        ? 'Divya asks step-by-step clinical questions during each diagnostic session. She investigates pain locations (Head, Chest, Stomach, Back, Joints, or Other), checks pain types, duration, severity, and associated health history to compile an assessment.'
+                        : 'ዲቭያ በእያንዳንዱ የምርመራ ውይይት ወቅት ደረጃ በደረጃ ጥያቄዎችን ትጠይቃለች። የህመሙን ቦታ (ራስ፣ ደረት፣ ሆድ፣ ጀርባ፣ መገጣጠሚያዎች ወይም ሌላ)፣ የህመሙን አይነት፣ የቆይታ ጊዜን፣ የህመም ደረጃን እና የቀደመ የጤና ታሪክዎን ትገመግማለች።'}
                     </p>
                   </div>
                 </div>
 
               </div>
 
-              {/* Row 2: Food & Nutrition */}
-              <div style={{ background: isLightMode ? 'rgba(0,0,0,0.015)' : 'rgba(255,255,255,0.015)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '20px', alignItems: 'center' }}>
-                <img src="https://i.postimg.cc/9QX25qST/food-nutriton.png" alt="Food & Nutrition" style={{ width: isMobile ? '100%' : '200px', height: '140px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
+              {/* Part 2: Food & Nutrition (Full Width) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <img src="https://i.postimg.cc/9QX25qST/food-nutriton.png" alt="Food & Nutrition" style={{ width: '100%', height: isMobile ? '220px' : '300px', objectFit: 'cover', borderRadius: '16px' }} />
                 <div>
-                  <strong style={{ display: 'block', fontSize: '14.5px', color: 'var(--text)', marginBottom: '6px' }}>
-                    {appLanguage === 'English' ? '🥗 Food & Nutrition' : '🥗 የአመጋገብ እና ስነ-ምግብ ክፍል'}
-                  </strong>
-                  <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                  <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '800', color: 'var(--text)' }}>
+                    {appLanguage === 'English' ? '🥗 3. Food & Nutrition — Customizing Your Eating Style' : '🥗 3. የአመጋገብ እና ስነ-ምግብ ክፍል — የአመጋገብ ዘይቤዎን ማሻሻል'}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                     {appLanguage === 'English' 
-                      ? 'Customizes your macros and micronutrients to optimize daily recovery. It guides you toward healthy, affordable, traditional Ethiopian meal alternatives (like Injera, Shiro, and Misir Wot) to improve your eating style and mineral balance.'
-                      : 'የእለት ተእለት ምግብዎን በማስተካከል የስነ-ምግብ እቅድ ያዘጋጃል። ጤናማ፣ ተመጣጣኝ እና ባህላዊ የኢትዮጵያ ምግቦችን (እንደ እንጀራ፣ ሺሮ፣ ምስር ወጥ) በመጠቆም የአመጋገብ ዘይቤዎን እና የሰውነትዎን ቪታሚኖች ያሻሽላል።'}
+                      ? 'Customizes your macros and micronutrients to optimize daily recovery. It guides you toward healthy, affordable, traditional Ethiopian meal alternatives (like Injera, Shiro Wot, Kik Alicha, and Misir Wot) to improve your eating style, vitamin balance, and mineral intake.'
+                      : 'የእለት ተእለት ምግብዎን በማስተካከል የስነ-ምግብ እቅድ ያዘጋጃል። ጤናማ፣ ተመጣጣኝ እና ባህላዊ የኢትዮጵያ ምግቦችን (እንደ እንጀራ፣ ሺሮ፣ ምስር ወጥ) በመጠቆም የአመጋገብ ዘይቤዎን፣ በሰውነትዎ ውስጥ ያሉ ቪታሚኖች እና ማዕድናት መጠንን ያሻሽላል።'}
                   </p>
                 </div>
               </div>
 
-              {/* Row 3: Analytics */}
-              <div style={{ background: isLightMode ? 'rgba(0,0,0,0.015)' : 'rgba(255,255,255,0.015)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '20px', alignItems: 'center' }}>
-                <img src="https://i.postimg.cc/C1GrxcnT/Analytics.png" alt="Analytics" style={{ width: isMobile ? '100%' : '200px', height: '140px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
+              {/* Part 3: Analytics (Full Width) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <img src="https://i.postimg.cc/C1GrxcnT/Analytics.png" alt="Analytics" style={{ width: '100%', height: isMobile ? '220px' : '300px', objectFit: 'cover', borderRadius: '16px' }} />
                 <div>
-                  <strong style={{ display: 'block', fontSize: '14.5px', color: 'var(--text)', marginBottom: '6px' }}>
-                    {appLanguage === 'English' ? '📈 Diagnostics Analytics' : '📈 የጤና ትንታኔ እና አሃዞች'}
-                  </strong>
-                  <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                  <h4 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '800', color: 'var(--text)' }}>
+                    {appLanguage === 'English' ? '📈 4. Diagnostics Analytics — Evaluating Progress Over Time' : '📈 4. የጤና ትንታኔ እና አሃዞች — በጊዜ ሂደት ያለውን ሂደት መገምገም'}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                     {appLanguage === 'English' 
                       ? 'The Analytics dashboard tracks critical metrics, recovery completion rates, and symptom intensity over time. This makes it easy for you and your healthcare professional to evaluate your physical progress and treatment response.'
                       : 'የጤና ትንታኔ ሰሌዳው (Analytics) በጊዜ ሂደት የእርስዎን የፈውስ ሂደት፣ የማገገም መጠን እና የህመም ስሜት ደረጃዎችን ይከታተላል። ይህም እርስዎ እና ሀኪምዎ የህክምና ውጤታማነትን በቀላሉ ለመገምገም ያስችላል።'}
