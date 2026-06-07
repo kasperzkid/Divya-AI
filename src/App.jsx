@@ -1507,8 +1507,12 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
 - Never recommend expensive imported foods or high-cost ingredients. Keep it nutritious, traditional, and middle-class.`;
 
     // Initialize diagnostic session
-    conversationHistoryRef.current = [{ role: 'system', text: diagnosticPrompt }];
-    const firstMsg = { id: Date.now(), role: 'ai', text: appLanguage === 'English' ? 'Hello! I am Divya, your health assistant. What is your main complaint today?' : 'ሰላም! እኔ ዲቭያ (Divya) የጤና ረዳትዎ ነኝ። ዛሬ ዋናው ቅሬታዎ ወይም የህመም ስሜትዎ ምንድነው?' };
+    const firstMsgText = appLanguage === 'English' ? 'Hello! I am Divya, your health assistant. What is your main complaint today?' : 'ሰላም! እኔ ዲቭያ (Divya) የጤና ረዳትዎ ነኝ። ዛሬ ዋናው ቅሬታዎ ወይም የህመም ስሜትዎ ምንድነው?';
+    conversationHistoryRef.current = [
+      { role: 'system', text: diagnosticPrompt },
+      { role: 'ai', text: firstMsgText }
+    ];
+    const firstMsg = { id: Date.now(), role: 'ai', text: firstMsgText };
     setMessages([firstMsg]);
     
     if (selectedMode === 'chat') {
@@ -1570,12 +1574,15 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
 - For remedies and hydration, recommend traditional herbal infusions like Ginger Tea (የዝንጅብል ሻይ), Tenadam (ጤናዳም), or Telba (ተልባ - flaxseed drink for stomach relief).
 - Never recommend expensive imported foods or high-cost ingredients. Keep it nutritious, traditional, and middle-class.`;
 
-    conversationHistoryRef.current = [{ role: 'system', text: revisionPrompt }];
-    
     const greeting = appLanguage === 'English'
       ? "Hello! Let's do a follow-up revision on your previous report. How are you feeling today, and did you take the recommended tests or pills?"
       : "ሰላም! በቀደመው ሪፖርትዎ ላይ የክትትል ክለሳ እናድርግ። ዛሬ እንዴት ነዎት? የተመከሩትን ምርመራዎች አድርገዋል ወይም መድሃኒቶችን ወስደዋል?";
 
+    conversationHistoryRef.current = [
+      { role: 'system', text: revisionPrompt },
+      { role: 'ai', text: greeting }
+    ];
+    
     const firstMsg = { id: Date.now(), role: 'ai', text: greeting };
     setMessages([firstMsg]);
     
