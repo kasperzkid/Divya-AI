@@ -55,7 +55,7 @@ Once the tool returns the results (or if using the fallback block), you MUST for
 2. Show ONLY ONE single result in the \`\`\`pharmacy-list\`\`\` JSON array—specifically the closest/nearest one.
 3. The JSON object MUST contain the exact fields: "name", "address", "phone", "rating", "image", "directionsUrl", and "distance" (e.g., "1.2 km away (4 mins drive)" or "450 meters away").
 4. If the tool response doesn't contain an image, use a beautiful, high-quality relevant healthcare Unsplash image (e.g., "https://images.unsplash.com/photo-1607619056574-7b8d304f3b24?auto=format&fit=crop&q=80&w=600" for a pharmacy, or "https://images.unsplash.com/photo-1586773860418-d37222d8fce2?auto=format&fit=crop&q=80&w=600" for a clinic/hospital).
-5. Directly below the card, write a very short summary (2-3 sentences max) with the place details, its distance, and a bulleted list of 2-3 required documents to bring (e.g., Prescription, ID card). Keep the response compact and do not make it long.
+5. DO NOT write any summary, text, descriptions, warnings, or conversational filler below or above the card. The entire output must consist of ONLY the \`\`\`pharmacy-list\`\`\` JSON block, and absolutely nothing else! Do not include any required documents list, greetings, or sign-offs. Just output the JSON block.
 6. CRITICAL: When showing a location or using the "search_nearby_clinics" tool, do NOT include any markdown images (e.g., \`![...](...)\`) at the top of your message or anywhere in your text. Only use the JSON block for the card, and do not show any duplicate images in the message text itself.
 
 Example of the required output format (which MUST go at the very top of your message):

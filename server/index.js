@@ -619,6 +619,72 @@ function createMcpServer(userId) {
     async ({ location, query }) => {
       const isPharmacy = query.toLowerCase().includes("pharmacy") || query.toLowerCase().includes("drug");
       
+      const GOOGLE_KEY = process.env.GOOGLE_MAPS_API_KEY;
+      if (GOOGLE_KEY) {
+        try {
+          console.log(`[MAPS] Using official Google Places API to search for "${query}" in "${location}"`);
+          const placeRes = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query + " in " + location)}&key=${GOOGLE_KEY}`);
+          if (placeRes.ok) {
+            const placeData = await placeRes.json();
+            const results = placeData.results || [];
+            
+            if (results.length > 0) {
+              const liveResults = [];
+              for (const place of results.slice(0, 3)) {
+                const name = place.name;
+                const address = place.formatted_address || `${location}, Ethiopia`;
+                const rating = place.rating ? place.rating.toFixed(1) : "4.5";
+                const lat = place.geometry?.location?.lat;
+                const lon = place.geometry?.location?.lng;
+                
+                let img = "";
+                if (place.photos && place.photos.length > 0) {
+                  const ref = place.photos[0].photo_reference;
+                  img = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photo_reference=${ref}&key=${GOOGLE_KEY}`;
+                } else {
+                  img = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=16&size=450x200&markers=color:red%7C${lat},${lon}&key=${GOOGLE_KEY}`;
+                }
+
+                const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+                const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + location)}`;
+                
+                let phone = "+251 (Local Phone)";
+                try {
+                  const detailsRes = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=formatted_phone_number&key=${GOOGLE_KEY}`);
+                  if (detailsRes.ok) {
+                    const detailsData = await detailsRes.json();
+                    phone = detailsData.result?.formatted_phone_number || phone;
+                  }
+                } catch (e) {
+                  console.warn("[MAPS] Failed to fetch place phone details:", e.message);
+                }
+
+                liveResults.push({
+                  name,
+                  address,
+                  phone,
+                  rating,
+                  image: img,
+                  mapsLink,
+                  directionsUrl
+                });
+              }
+
+              console.log(`[MAPS] Google Places search successfully returned ${liveResults.length} real locations!`);
+              return {
+                content: [{ 
+                  type: "text", 
+                  text: `SUCCESS: Found medical locations matching "${query}" in ${location}:\n\n` + 
+                        liveResults.map((r, i) => `${i+1}. Name: ${r.name}\n   📍 Address: ${r.address}\n   📞 Phone: ${r.phone}\n   ⭐ Rating: ${r.rating}\n   🖼️ Image: ${r.image}\n   🗺️ Maps Link: ${r.mapsLink}\n   🚗 Directions Link: ${r.directionsUrl}`).join("\n\n")
+                }]
+              };
+            }
+          }
+        } catch (err) {
+          console.error("[MAPS] Google Places API search failed, falling back to OSM:", err.message);
+        }
+      }
+      
       // Default curated results for fallback or Addis Ababa
       const curatedResults = isPharmacy ? [
         {
