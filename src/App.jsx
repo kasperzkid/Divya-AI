@@ -321,7 +321,7 @@ function App() {
   const [attachment, setAttachment]                   = useState(null);
   const [translatingId, setTranslatingId]             = useState(null);
   const [networkStatus, setNetworkStatus]             = useState(navigator.onLine ? 'online' : 'offline');
-  const [activeTab, setActiveTab]                     = useState('chat');
+  const [activeTab, setActiveTab]                     = useState('sessions');
   const [activeSettingsTab, setActiveSettingsTab]     = useState('Account');
   const [copiedMsgId, setCopiedMsgId]                 = useState(null);
   const [isProfileMenuOpen, setIsProfileMenuOpen]     = useState(false);
@@ -2646,13 +2646,13 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
 
         <div className="sidebar-nav">
           {[
-            { id: 'chat', icon: <MessageSquare size={18} />, label: 'Chat' },
-            { id: 'sessions', icon: <ClipboardList size={18} />, label: 'Sessions', locked: !user },
-            { id: 'plan', icon: <Calendar size={18} />, label: 'Plan', locked: !user },
-            { id: 'food', icon: <Apple size={18} />, label: 'Food & Nutrition', locked: !user },
-            { id: 'analytics', icon: <Activity size={18} />, label: 'Analytics', locked: !user },
+            { id: 'sessions', icon: <ClipboardList size={18} />, label: appLanguage === 'English' ? 'Sessions' : 'ክፍለ ጊዜዎች', locked: !user },
+            { id: 'plan', icon: <Calendar size={18} />, label: appLanguage === 'English' ? 'Plan' : 'ዕቅድ', locked: !user },
+            { id: 'chat', icon: <MessageSquare size={18} />, label: appLanguage === 'English' ? 'Chat' : 'ውይይት' },
+            { id: 'food', icon: <Apple size={18} />, label: appLanguage === 'English' ? 'Food & Nutrition' : 'አመጋገብ እና ስነ-ምግብ', locked: !user },
+            { id: 'analytics', icon: <Activity size={18} />, label: appLanguage === 'English' ? 'Analytics' : 'ትንታኔ', locked: !user },
             { id: 'howitworks', icon: <BookOpen size={18} />, label: appLanguage === 'English' ? 'How It Works' : 'እንዴት እንደሚሰራ' },
-            { id: 'settings', icon: <Settings size={18} />, label: 'Settings', locked: !user }
+            { id: 'settings', icon: <Settings size={18} />, label: appLanguage === 'English' ? 'Settings' : 'ቅንብሮች', locked: !user }
           ].map(item => (
             <button
               key={item.id}

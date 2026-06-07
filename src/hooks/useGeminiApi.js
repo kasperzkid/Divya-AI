@@ -47,6 +47,7 @@ When the user asks you to schedule or make an appointment (e.g. "after a week", 
 
 MAPS & PHARMACY CARDS INSTRUCTIONS:
 When the user asks you to show the nearest pharmacy, clinic, hospital, or medical facility:
+- NEVER respond with plain text only. You MUST ALWAYS generate the \`\`\`pharmacy-list\`\`\` JSON block at the very top of your message.
 - If the "search_nearby_clinics" tool is present in your available tools, you MUST call the tool immediately with the query "pharmacy" or "hospital" accordingly.
 - If the "search_nearby_clinics" tool is NOT present in your tools list (disabled), DO NOT output text saying you are calling the tool or attempting to execute it. Instead, notify the user that they can enable the Google Maps MCP service in App Settings for live lookups, but immediately provide a curated fallback list of top facilities in Addis Ababa (e.g. Bole Anbessa Pharmacy, Kenema Pharmacy, Zewditu Pharmacy, or Hayat General Hospital) in the required \`\`\`pharmacy-list\`\`\` JSON block anyway so the UI renders beautiful interactive cards for them!
 Once the tool returns the results (or if using the fallback block), you MUST format your response exactly like this, keeping it short, highly concise, and extremely compact:

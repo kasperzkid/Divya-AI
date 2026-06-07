@@ -417,11 +417,11 @@ export default function PlanTab({
         gap: isMobile ? '20px' : '30px',
         width: '100%',
         alignItems: 'flex-start',
-        justifyContent: 'center'
+        justifyContent: 'flex-start'
       }}>
         
         {/* Left Column: Weekly Strip, Categories & Today's Plan */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: isMobile ? '1 1 100%' : '1.4 1 450px', maxWidth: isMobile ? 'none' : '750px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: isMobile ? '1 1 100%' : '1.4 1 450px', maxWidth: 'none', width: '100%' }}>
           
           {/* 1. Daily Plan Header */}
           <div style={{
@@ -711,7 +711,7 @@ export default function PlanTab({
         }} className="plan-vertical-divider" />
 
         {/* Right Side: WeeklyProgress, Streaks & Upcoming Plan Preview */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', flex: isMobile ? '1 1 100%' : '1 1 320px', maxWidth: isMobile ? 'none' : '480px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', flex: isMobile ? '1 1 100%' : '1 1 320px', maxWidth: 'none', width: '100%' }}>
           
           {/* 4. Weekly Progress Strip Section */}
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
