@@ -1155,11 +1155,31 @@ function App() {
   };
 
   const retryMessage = (msgId) => {
-    const msg = messages.find(m => m.id === msgId);
-    if (!msg) return;
-    setMessages(prev => prev.filter(m => m.id !== msgId));
-    conversationHistoryRef.current = conversationHistoryRef.current.filter(m => !(m.role === 'user' && m.text === msg.text));
-    handleTextSubmit(msg.text);
+    const msgIdx = messages.findIndex(m => m.id === msgId);
+    if (msgIdx === -1) return;
+
+    const clickedMsg = messages[msgIdx];
+    let userMsgText = "";
+    let sliceIndex = -1;
+
+    if (clickedMsg.role === 'user') {
+      userMsgText = clickedMsg.text;
+      sliceIndex = msgIdx;
+    } else if (clickedMsg.role === 'ai') {
+      // Find the preceding user message
+      const precedingUserMsg = messages.slice(0, msgIdx).reverse().find(m => m.role === 'user');
+      if (precedingUserMsg) {
+        userMsgText = precedingUserMsg.text;
+        sliceIndex = messages.findIndex(m => m.id === precedingUserMsg.id);
+      }
+    }
+
+    if (sliceIndex !== -1 && userMsgText) {
+      const remainingMessages = messages.slice(0, sliceIndex);
+      setMessages(remainingMessages);
+      conversationHistoryRef.current = remainingMessages.map(m => ({ role: m.role, text: m.text }));
+      handleTextSubmit(userMsgText);
+    }
   };
 
   const translateMsg = (msg) => {
@@ -3414,6 +3434,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                             </button>
                             <button className="msg-action-btn" onClick={() => editUserMessage(msg.id)} title="Edit message">
                               <Pencil size={13}/><span>Edit</span>
+                            </button>
+                            <button className="msg-action-btn" onClick={() => retryMessage(msg.id)} title="Retry/Resend message">
+                              <RefreshCcw size={13}/><span>Retry</span>
                             </button>
                           </div>
                         )}

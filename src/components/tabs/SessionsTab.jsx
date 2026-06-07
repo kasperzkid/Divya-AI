@@ -1,5 +1,7 @@
-import { X, Stethoscope, Activity, Pencil, Trash2, FileText, ClipboardList, RefreshCcw, Brain, HeartPulse, ChevronRight } from 'lucide-react';
+import { X, Stethoscope, Activity, Pencil, Trash2, FileText, ClipboardList, RefreshCcw, Brain, HeartPulse, ChevronRight, FileDown } from 'lucide-react';
 import { getDiagnosticReportData, parseClinicalReport, cleanItemText } from '../../utils/clinicalParser';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function SessionsTab({
   appLanguage,
@@ -18,6 +20,395 @@ export default function SessionsTab({
   resumeUnfinishedSession,
   setUnfinishedSessions,
 }) {
+  const exportReportAsPdf = async () => {
+    if (!masterReport) return;
+    
+    const conclusion = masterReport.messages?.find(m => m.role === 'ai' && (m.text.includes('ASSESSMENT:') || m.text.includes('TEMPORARY RELIEF:')));
+    if (!conclusion) {
+      alert(appLanguage === 'English' ? 'No report data available to export.' : 'ለመላክ የሚያስችል የሪፖርት መረጃ አልተገኘም።');
+      return;
+    }
+    
+    const reportData = parseClinicalReport(conclusion.text);
+    if (!reportData) return;
+    
+    setIsReportMenuOpen(false);
+    
+    const isEnglish = appLanguage === 'English';
+    
+    // Create an off-screen container for the high-fidelity PDF rendering
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    container.style.width = '800px'; // standard width for crisp rendering on A4
+    container.style.background = '#ffffff';
+    container.style.color = '#1e293b';
+    container.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+    container.style.padding = '40px 50px';
+    container.style.boxSizing = 'border-box';
+    
+    const reportRefId = `DIVYA-REF-${Math.abs(conclusion.text.length * 31).toString(36).toUpperCase()}`;
+    const formattedDate = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    
+    const extractImageAndClean = (lineText) => {
+      const imgRegex = /!\[(.*?)\]\((.*?)\)/;
+      const match = imgRegex.exec(lineText);
+      if (match) {
+        const cleanText = lineText.replace(imgRegex, '').trim();
+        return { text: cleanText, imageUrl: match[2], imageAlt: match[1] };
+      }
+      return { text: lineText, imageUrl: null, imageAlt: null };
+    };
+
+    const formatBold = (str) => {
+      if (!str) return '';
+      let isBoldOpen = false;
+      return str.replace(/\*\*/g, () => {
+        isBoldOpen = !isBoldOpen;
+        return isBoldOpen ? '<strong>' : '</strong>';
+      });
+    };
+
+    const parseTestLine = (lineText) => {
+      let clean = lineText.replace(/^[\s*\-\d\.]+\s*/, '');
+      let priorityText = '';
+      let priorityColor = '#10b981'; // routine (emerald)
+      let priorityBg = '#ecfdf5';
+      
+      if (/urgent|ከባድ|አስቸኳይ/i.test(clean)) {
+        priorityText = isEnglish ? 'Urgent' : 'አስቸኳይ';
+        priorityColor = '#ef4444'; // urgent (red)
+        priorityBg = '#fef2f2';
+      } else if (/soon|በቅርቡ/i.test(clean)) {
+        priorityText = isEnglish ? 'Soon' : 'በቅርቡ';
+        priorityColor = '#f59e0b'; // soon (orange)
+        priorityBg = '#fffbeb';
+      } else {
+        priorityText = isEnglish ? 'Routine' : 'መደበኛ';
+      }
+      return { text: clean, priorityText, priorityColor, priorityBg };
+    };
+
+    let htmlContent = `
+      <!-- Top Decorative Bar -->
+      <div style="height: 6px; background: linear-gradient(90deg, #52796f, #84a98c); margin: -40px -50px 30px -50px;"></div>
+      
+      <!-- Medical Institute Header -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span style="font-size: 24px;">🩺</span>
+            <span style="font-size: 20px; font-weight: 800; color: #354f52; letter-spacing: 0.5px;">DIVYA CLINICAL HEALTH INSTITUTE</span>
+          </div>
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #52796f; font-weight: 700;">
+            Autonomous Artificial Intelligence Diagnostics Core
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="background: #e6f0ed; color: #354f52; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 6px; border: 1px solid rgba(82, 121, 111, 0.15);">
+            ${isEnglish ? 'OFFICIAL DIAGNOSTIC RECORD' : 'ክሊኒካዊ የምርመራ ሪፖርት'}
+          </div>
+          <div style="font-family: monospace; font-size: 12px; color: #64748b; font-weight: 600;">${reportRefId}</div>
+        </div>
+      </div>
+
+      <!-- Metadata Fields -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; display: flex; gap: 40px; margin-bottom: 30px; font-size: 13px; color: #475569;">
+        <div>
+          <strong>${isEnglish ? 'Issued By:' : 'የተዘጋጀው በ:'}</strong>
+          <span style="color: #1e293b; font-weight: 600; margin-left: 6px;">Divya Medical AI (v1.0)</span>
+        </div>
+        <div>
+          <strong>${isEnglish ? 'Date Generated:' : 'ቀን:'}</strong>
+          <span style="color: #1e293b; font-weight: 600; margin-left: 6px;">${formattedDate}</span>
+        </div>
+        <div>
+          <strong>${isEnglish ? 'Classification:' : 'ምደባ:'}</strong>
+          <span style="color: #0d9488; font-weight: 700; margin-left: 6px; letter-spacing: 0.5px;">${isEnglish ? 'CONFIDENTIAL' : 'ሚስጥራዊ'}</span>
+        </div>
+      </div>
+    `;
+
+    if (reportData.opening) {
+      htmlContent += `
+        <div style="font-size: 14.5px; font-style: italic; color: #334155; border-left: 4px solid #52796f; padding-left: 18px; margin-bottom: 30px; line-height: 1.6;">
+          ${reportData.opening.replace(/\*\*/g, '').replace(/\*/g, '').trim()}
+        </div>
+      `;
+    }
+
+    if (reportData.assessment) {
+      const formattedAssessment = reportData.assessment
+        .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1e293b; font-weight: 700;">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br/>');
+
+      htmlContent += `
+        <div style="background: linear-gradient(135deg, rgba(82, 121, 111, 0.04), rgba(132, 169, 140, 0.08)); border: 1px solid rgba(82, 121, 111, 0.15); border-radius: 16px; padding: 24px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.015);">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+            <span style="font-size: 18px;">🧠</span>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
+              ${isEnglish ? 'Clinical Impression' : 'ክሊኒካዊ ግምገማ'}
+            </h4>
+          </div>
+          <div style="color: #334155; font-size: 14px; line-height: 1.7; word-wrap: break-word;">
+            ${formattedAssessment}
+          </div>
+        </div>
+      `;
+    }
+
+    if (reportData.relief.length > 0) {
+      htmlContent += `
+        <div style="margin-bottom: 30px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+            <span style="font-size: 18px;">❤️</span>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
+              ${isEnglish ? 'Temporary Relief Suggestions' : 'ጊዜያዊ ማስታገሻ ምክሮች'}
+            </h4>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+      `;
+
+      reportData.relief.forEach((rawItem) => {
+        const { text: cleanText, imageUrl, imageAlt } = extractImageAndClean(rawItem);
+        let displayMsg = formatBold(cleanText.replace(/^[\s*\-\d\.\•]+\s*/, ''));
+        if (displayMsg) {
+          htmlContent += `
+            <div style="background: #fafaf9; border: 1px solid #f1f1ee; border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <span style="color: #52796f; font-weight: bold; font-size: 16px; line-height: 1;">✓</span>
+                <div style="color: #334155; font-size: 13.5px; line-height: 1.6; flex: 1;">
+                  ${displayMsg}
+                </div>
+              </div>
+              ${imageUrl ? `
+                <div style="border-radius: 8px; overflow: hidden; border: 1px solid #e5e5e0; margin-top: 6px;">
+                  <img src="${imageUrl}" alt="${imageAlt || 'Relief step'}" style="width: 100%; max-height: 220px; object-fit: cover; display: block;" />
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+      });
+
+      htmlContent += `
+          </div>
+        </div>
+      `;
+    }
+
+    if (reportData.tests.length > 0) {
+      htmlContent += `
+        <div style="margin-bottom: 30px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+            <span style="font-size: 18px;">🔬</span>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
+              ${isEnglish ? 'Recommended Diagnostic Tests' : 'የሚመከሩ የላብራቶሪ ምርመራዎች'}
+            </h4>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+      `;
+
+      reportData.tests.forEach((rawItem) => {
+        const { text: cleanText } = extractImageAndClean(rawItem);
+        const parsed = parseTestLine(cleanText);
+        let displayMsg = formatBold(parsed.text);
+        
+        if (displayMsg) {
+          htmlContent += `
+            <div style="background: #fafaf9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; gap: 16px;">
+              <div style="display: flex; gap: 12px; align-items: flex-start; flex: 1;">
+                <span style="color: #52796f; font-weight: bold; font-size: 16px; line-height: 1;">→</span>
+                <div style="color: #334155; font-size: 13.5px; line-height: 1.6;">
+                  ${displayMsg}
+                </div>
+              </div>
+              <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 20px; color: ${parsed.priorityColor}; background: ${parsed.priorityBg}; border: 1px solid rgba(0,0,0,0.02); white-space: nowrap;">
+                ${parsed.priorityText}
+              </span>
+            </div>
+          `;
+        }
+      });
+
+      htmlContent += `
+          </div>
+        </div>
+      `;
+    }
+
+    if (reportData.warningSigns.length > 0) {
+      htmlContent += `
+        <div style="margin-bottom: 30px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+            <span style="font-size: 18px;">🚨</span>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #b91c1c;">
+              ${isEnglish ? 'Critical Warning Signs (Seek Immediate Care)' : 'ወዲያውኑ የህክምና እርዳታ የሚያስፈልጋቸው ምልክቶች'}
+            </h4>
+          </div>
+          <div style="border: 1px solid rgba(239, 68, 68, 0.2); background: #fef2f2; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+      `;
+
+      reportData.warningSigns.forEach((rawItem) => {
+        let displayMsg = formatBold(rawItem.replace(/^[\s*\-\d\.\•]+\s*/, ''));
+        if (displayMsg) {
+          htmlContent += `
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span style="color: #ef4444; font-size: 14px; margin-top: 1px;">⚠️</span>
+              <div style="color: #991b1b; font-size: 13.5px; font-weight: 600; line-height: 1.5;">
+                ${displayMsg}
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      htmlContent += `
+          </div>
+        </div>
+      `;
+    }
+
+    const parsedKeyTerms = reportData.keyTerms.map(line => {
+      const parts = line.split('|').map(p => p.trim()).filter(Boolean);
+      if (parts.length >= 2) {
+        return { term: parts[0], definition: parts[1] };
+      }
+      return null;
+    }).filter(Boolean);
+
+    if (parsedKeyTerms.length > 0) {
+      htmlContent += `
+        <div style="margin-bottom: 30px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+            <span style="font-size: 18px;">📖</span>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
+              ${isEnglish ? 'Medical Glossary & Key Terms' : 'የህክምና ቃላት መፍቻ'}
+            </h4>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+      `;
+
+      parsedKeyTerms.forEach((item) => {
+        htmlContent += `
+          <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 2px;">
+            <strong style="color: #334155; font-size: 13.5px; display: block; margin-bottom: 4px;">${item.term}</strong>
+            <span style="color: #64748b; font-size: 13px; line-height: 1.5; display: block;">${item.definition}</span>
+          </div>
+        `;
+      });
+
+      htmlContent += `
+          </div>
+        </div>
+      `;
+    }
+
+    const parsedReferences = reportData.references.map(line => {
+      const linkRegex = /\[(.*?)\]\((.*?)\)/;
+      const match = linkRegex.exec(line);
+      if (match) return { label: match[1], url: match[2] };
+      const clean = line.replace(/^[\s*\-\d\.]+\s*/, '');
+      if (clean) return { label: clean, url: '#' };
+      return null;
+    }).filter(Boolean);
+
+    if (parsedReferences.length > 0) {
+      htmlContent += `
+        <div style="margin-bottom: 35px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+            <span style="font-size: 18px;">📚</span>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2f3e46;">
+              ${isEnglish ? 'Clinical Research References' : 'ክሊኒካዊ ዋቢዎች'}
+            </h4>
+          </div>
+          <ol style="margin: 0; padding-left: 20px; font-size: 13px; color: #475569; display: flex; flex-direction: column; gap: 8px; line-height: 1.5;">
+      `;
+
+      parsedReferences.forEach((ref) => {
+        htmlContent += `
+          <li>
+            <span style="font-weight: 600; color: #334155;">${ref.label}</span>
+            ${ref.url && ref.url !== '#' ? `<br/><span style="font-size: 11px; color: #0d9488; word-break: break-all;">${ref.url}</span>` : ''}
+          </li>
+        `;
+      });
+
+      htmlContent += `
+          </ol>
+        </div>
+      `;
+    }
+
+    if (reportData.disclaimer) {
+      htmlContent += `
+        <div style="border-top: 1px dashed #cbd5e1; margin-top: 40px; padding-top: 24px; text-align: center;">
+          <div style="font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+            ⚠️ ${isEnglish ? 'Medical Disclaimer' : 'የህክምና ማስጠንቀቂያ'}
+          </div>
+          <div style="font-size: 11.5px; color: #94a3b8; font-style: italic; line-height: 1.6; max-width: 680px; margin: 0 auto 24px auto;">
+            ${reportData.disclaimer.replace(/^⚠️\s*/, '')}
+          </div>
+          <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 6px; font-size: 11px; color: #64748b;">
+            <div style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Digitally Signed & Certified</div>
+            <div style="font-family: monospace; font-size: 10px; color: #94a3b8; padding: 4px 12px; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 4px;">
+              Divya clinical-engine-signature::${reportRefId.split('-').pop()}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    container.innerHTML = htmlContent;
+    document.body.appendChild(container);
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const canvas = await html2canvas(container, {
+        scale: 2.2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      document.body.removeChild(container);
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const baseName = masterReport.title || 'Wellness_Report';
+      const safeName = baseName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      
+      pdf.save(`${safeName}.pdf`);
+    } catch (err) {
+      console.error('Failed to generate PDF:', err);
+      if (document.body.contains(container)) {
+        document.body.removeChild(container);
+      }
+      alert(isEnglish ? 'Failed to download PDF. Please try again.' : 'PDF ለማውረድ አልተቻለም። እባክዎ እንደገና ይሞክሩ።');
+    }
+  };
+
   return (
     <div className="sample-page">
       <div className="sessions-header">
@@ -84,9 +475,12 @@ export default function SessionsTab({
                     </svg>
                   </button>
                   {isReportMenuOpen && (
-                    <div style={{ position: 'absolute', top: '100%', right: '0', background: 'var(--bg-solid)', border: '1px solid var(--border)', borderRadius: '12px', padding: '8px', zIndex: 10, width: '160px', boxShadow: '0 16px 40px rgba(0,0,0,0.2)', marginTop: '4px' }}>
+                    <div style={{ position: 'absolute', top: '100%', right: '0', background: 'var(--bg-solid)', border: '1px solid var(--border)', borderRadius: '12px', padding: '8px', zIndex: 10, width: '180px', boxShadow: '0 16px 40px rgba(0,0,0,0.2)', marginTop: '4px' }}>
                       <button onClick={renameMasterReport} style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none', color: 'var(--text)', padding: '10px 12px', cursor: 'pointer', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: '500', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background='var(--surface-hover)'} onMouseOut={e => e.currentTarget.style.background='transparent'}>
                         <Pencil size={14} /> Rename
+                      </button>
+                      <button onClick={exportReportAsPdf} style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none', color: 'var(--text)', padding: '10px 12px', cursor: 'pointer', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: '500', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background='var(--surface-hover)'} onMouseOut={e => e.currentTarget.style.background='transparent'}>
+                        <FileDown size={14} /> Export as PDF
                       </button>
                       <button onClick={deleteMasterReport} style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none', color: '#ef4444', padding: '10px 12px', cursor: 'pointer', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: '500', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background='rgba(239, 68, 68, 0.1)'} onMouseOut={e => e.currentTarget.style.background='transparent'}>
                         <Trash2 size={14} /> Delete
