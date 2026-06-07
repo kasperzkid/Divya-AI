@@ -5,7 +5,7 @@ const defaultSettings = {
   personalAge: '30',
   personalWeight: '70',
   personalHeight: '175',
-  appLanguage: 'English',
+  appLanguage: 'Amharic',
   isLightMode: false,
   isTtsEnabled: true,
   contextLimit: '8192',
