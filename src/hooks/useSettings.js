@@ -10,7 +10,7 @@ const defaultSettings = {
   isTtsEnabled: true,
   contextLimit: '8192',
   webSearchIntegration: true,
-  aiModel: 'gemini-3.5-flash',
+  aiModel: 'gemini-2.5-flash',
   customSystemPrompt: '',
   mcpGoogleDrive: false,
   mcpGoogleDriveUrl: 'https://divya-ai-syxr.onrender.com/mcp/updates',
