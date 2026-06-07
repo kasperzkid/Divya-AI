@@ -9,6 +9,7 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
   const activeAudioRef = useRef(null);
   const [isSpeaking, setIsSpeaking]       = useState(false);
   const [speakingMsgId, setSpeakingMsgId] = useState(null);
+  const [isGeneratingVoice, setIsGeneratingVoice] = useState(false);
 
   /** Choose a Gemini voice based on language */
   function getVoice(lang) {
@@ -82,6 +83,7 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
     }
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
+    setIsGeneratingVoice(false);
     setSpeakingMsgId(null);
   };
 
@@ -89,6 +91,7 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
     if (!text?.trim()) return;
     if (isMuted) {
       setIsSpeaking(false);
+      setIsGeneratingVoice(false);
       setSpeakingMsgId(null);
       if (isCallActiveRef?.current) startListening?.();
       return;
@@ -96,12 +99,15 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
     try {
       if (msgId) setSpeakingMsgId(msgId);
       stopSpeaking(); // cancel any current audio first
-      setIsSpeaking(true);
+      setIsGeneratingVoice(true);
+      setIsSpeaking(false);
 
       // Check if this is the introduction text and we have cached audio
       const isIntro = text.includes("Divya") && (text.includes("introduce") || text.includes("አስተዋውቅ") || (text.includes("ሰላም") && text.includes("Drive")));
       if (isIntro && localStorage.getItem('divya_intro_audio_cache')) {
         const cachedBase64 = localStorage.getItem('divya_intro_audio_cache');
+        setIsGeneratingVoice(false);
+        setIsSpeaking(true);
         await playBase64Audio(cachedBase64, 'audio/wav');
         return;
       }
@@ -152,10 +158,14 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
         if (isIntro) {
           localStorage.setItem('divya_intro_audio_cache', part.data);
         }
+        setIsGeneratingVoice(false);
+        setIsSpeaking(true);
         await playBase64Audio(part.data, part.mimeType);
       } else {
         // Gemini returned something unexpected — fall back to browser TTS
         console.warn('Gemini TTS returned no audio data, using browser TTS');
+        setIsGeneratingVoice(false);
+        setIsSpeaking(true);
         await speakWithBrowser(text, appLanguage);
       }
 
@@ -163,15 +173,20 @@ export function useSpeech({ appLanguage, isCallActiveRef, isMuted, startListenin
       if (err.message !== 'Aborted') {
         console.warn('Gemini TTS failed, falling back to browser TTS:', err.message);
         // Graceful fallback to browser Web Speech API
-        try { await speakWithBrowser(text, appLanguage); } catch {}
+        try { 
+          setIsGeneratingVoice(false);
+          setIsSpeaking(true);
+          await speakWithBrowser(text, appLanguage); 
+        } catch {}
       }
     } finally {
       setIsSpeaking(false);
+      setIsGeneratingVoice(false);
       setSpeakingMsgId(null);
       activeAudioRef.current = null;
       if (isCallActiveRef?.current) startListening?.();
     }
   };
 
-  return { activeAudioRef, isSpeaking, speakingMsgId, speak, stopSpeaking };
+  return { activeAudioRef, isSpeaking, speakingMsgId, speak, stopSpeaking, isGeneratingVoice };
 }

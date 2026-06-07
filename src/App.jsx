@@ -1066,7 +1066,7 @@ function App() {
     a.click();
   };
 
-  const { activeAudioRef, isSpeaking, speakingMsgId, speak, stopSpeaking } = useSpeech({
+  const { activeAudioRef, isSpeaking, speakingMsgId, speak, stopSpeaking, isGeneratingVoice } = useSpeech({
     appLanguage,
     isCallActiveRef,
     isMuted,
@@ -3018,9 +3018,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                         </span>
                         {msg.role === 'ai' && (msg.isIntroduction || (msg.text.includes("Divya") && msg.text.includes("Drive"))) && (
                           <div style={{ margin: '15px 0', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '10px' }}>
-                            <DivyaAvatar3D isSpeaking={speakingMsgId === msg.id || speakingMsgId === msg.id + '_am'} />
+                            <DivyaAvatar3D isSpeaking={(speakingMsgId === msg.id || speakingMsgId === msg.id + '_am') && !isGeneratingVoice} />
                             <span style={{ fontSize: '11px', color: 'var(--accent)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                              {(speakingMsgId === msg.id || speakingMsgId === msg.id + '_am') ? 'Divya Hologram: Speaking...' : 'Divya Hologram: Idle'}
+                              {(speakingMsgId === msg.id || speakingMsgId === msg.id + '_am') ? (isGeneratingVoice ? 'Divya Hologram: Wait a minute...' : 'Divya Hologram: Speaking...') : 'Divya Hologram: Idle'}
                             </span>
                           </div>
                         )}
@@ -3506,6 +3506,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               <div style={{fontSize:'11px', color: isLightMode ? 'rgba(47, 62, 70, 0.5)' : 'rgba(254, 250, 224, 0.5)', fontFamily: 'var(--font-body)', fontWeight:'500', marginTop:'10px', letterSpacing:'2.5px', textTransform:'uppercase'}}>
                 { callStatus === 'connecting' ? (appLanguage === 'English' ? 'Connecting...' : 'እያገናኘ ነው...') 
                 : isThinking ? (appLanguage === 'English' ? 'Thinking...' : 'እያሰበ ነው...') 
+                : isGeneratingVoice ? (appLanguage === 'English' ? 'Wait a minute...' : 'እባክዎ ትንሽ ይጠብቁ...') 
                 : isSpeaking ? (appLanguage === 'English' ? 'Speaking...' : 'እየተናገረ ነው...') 
                 : isListening ? (appLanguage === 'English' ? 'Recording...' : 'እየቀረጸ ነው...')
                 : formatTime(callDuration) }
@@ -4764,7 +4765,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
             <div style={{ margin: '10px 0', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '8px' }}>
               <DivyaAvatar3D isSpeaking={isSpeaking} />
               <span style={{ fontSize: '11px', color: 'var(--accent)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                {isSpeaking ? (appLanguage === 'English' ? 'Hologram speaking...' : 'ሆሎግራም ድምፅ እያሰማ ነው...') : (appLanguage === 'English' ? 'Divya Interactive Hologram' : 'ዲቭያ መስተጋብራዊ ሆሎግራም')}
+                {isGeneratingVoice ? (appLanguage === 'English' ? 'Wait a minute...' : 'እባክዎ ትንሽ ይጠብቁ...') : isSpeaking ? (appLanguage === 'English' ? 'Hologram speaking...' : 'ሆሎግራም ድምፅ እያሰማ ነው...') : (appLanguage === 'English' ? 'Divya Interactive Hologram' : 'ዲቭያ መስተጋብራዊ ሆሎግራም')}
               </span>
             </div>
 
