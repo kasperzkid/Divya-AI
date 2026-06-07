@@ -556,31 +556,12 @@ function App() {
   // Connect/disconnect MCP services dynamically based on settings
   useEffect(() => {
     const handleConnections = async () => {
-      const uId = user?.id;
-      if (!uId || uId === "guest") {
-        // Guest users cannot establish MCP connections
-        await mcpManager.disconnectService("unified-gateway");
-        return;
-      }
-      const isAnyMcpEnabled = settings.mcpGoogleDrive || settings.mcpGoogleCalendar || settings.mcpEmail || settings.mcpGoogleMaps;
-      
-      if (isAnyMcpEnabled) {
-        // Connect straight to our unified self-hosted gateway endpoint ONLY if not already connected
-        if (!mcpManager.clients["unified-gateway"]) {
-          const gatewayUrl = `https://divya-ai-syxr.onrender.com/mcp/updates?userId=${uId}`;
-          try {
-            await mcpManager.connectService("unified-gateway", gatewayUrl);
-          } catch (e) {
-            console.warn("[MCP] Unified connection failed:", e);
-          }
-        }
-      } else {
-        await mcpManager.disconnectService("unified-gateway");
-      }
+      // MCP services are completely disabled to prevent connection and protocol errors
+      await mcpManager.disconnectService("unified-gateway");
     };
     
     handleConnections();
-  }, [settings.mcpGoogleDrive, settings.mcpGoogleCalendar, settings.mcpEmail, settings.mcpGoogleMaps, user]);
+  }, [user]);
   const { personalName, personalAge, personalWeight, personalHeight, isLightMode, isTtsEnabled, appLanguage, aiModel } = settings;
   const setPersonalName = (v) => updateSettings({ personalName: v });
   const setPersonalAge = (v) => updateSettings({ personalAge: v });

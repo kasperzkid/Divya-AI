@@ -805,8 +805,21 @@ app.get("/mcp/updates", async (req, res) => {
     transport.userId = userId;
     mcpTransports[sessionId] = transport;
 
+    // Send a periodic keep-alive comment to prevent CDNs, Nginx, or browsers from timing out the HTTP/3 SSE connection
+    const keepAliveInterval = setInterval(() => {
+      try {
+        if (!res.writableEnded) {
+          res.write(": keepalive ping\n\n");
+        }
+      } catch (e) {
+        console.warn("[MCP] Keep-alive ping failed:", e.message);
+        clearInterval(keepAliveInterval);
+      }
+    }, 15000);
+
     transport.onclose = () => {
       console.log(`[MCP] Unified transport closed for session: ${sessionId}`);
+      clearInterval(keepAliveInterval);
       delete mcpTransports[sessionId];
     };
 

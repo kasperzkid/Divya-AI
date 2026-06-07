@@ -1600,13 +1600,15 @@ body.light-mode .message-row.ai .bubble {
 .message-row.ai .bubble ul,
 .message-row.ai .bubble ol {
   padding-left: 20px;
-  margin: 8px 0;
+  margin: 0 0 8px 0;
 }
 .message-row.ai .bubble li {
+  margin-top: 0;
   margin-bottom: 4px;
   white-space: normal;
 }
 .message-row.ai .bubble p {
+  margin-top: 0;
   margin-bottom: 8px;
   white-space: normal;
 }
@@ -1616,7 +1618,19 @@ body.light-mode .message-row.ai .bubble {
 .message-row.ai .bubble h4,
 .message-row.ai .bubble h5,
 .message-row.ai .bubble h6 {
+  margin-top: 14px;
+  margin-bottom: 6px;
   white-space: normal;
+  color: var(--accent);
+}
+.message-row.ai .bubble h1:first-child,
+.message-row.ai .bubble h2:first-child,
+.message-row.ai .bubble h3:first-child,
+.message-row.ai .bubble h4:first-child,
+.message-row.ai .bubble h5:first-child,
+.message-row.ai .bubble h6:first-child,
+.message-row.ai .bubble p:first-child {
+  margin-top: 0;
 }
 .message-row.ai .bubble p:last-child {
   margin-bottom: 0;
