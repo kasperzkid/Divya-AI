@@ -1270,6 +1270,12 @@ You must follow this exact flow. Ask ONE question at a time.
 Never ask multiple questions at once. Be conversational, 
 warm, and professional.
 
+CRITICAL RULE — INFO EXTRACTION & QUESTION SKIPPING:
+- Read the patient's messages very carefully. If the patient has ALREADY provided the answer to a question in a previous message (e.g. they said "I have back pain" or "it started 3 days ago"), YOU MUST NOT ask that question! Skip it immediately and move directly to the next question in the flow.
+- For example, if they already said "I have back pain", do not ask "Where exactly is the pain?". Instead, move directly to Q2 — Type: "How would you describe the pain?" but customize it to acknowledge their input (e.g. "I understand you have back pain. How would you describe the pain?").
+- If they already said "I've had severe chest pain since yesterday", you would skip Q1 (Location), Q3 (Duration), and Q4 (Severity), and move directly to Q2 (Type) or Q5 (Pattern).
+- Keep your questions customized, warm, and natural. Never ask for information they have already volunteered!
+
 PHASE 1 — OPENING (1 question):
 Start by asking:
 "Hello! I am Divya, your health assistant. 
@@ -3108,9 +3114,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <MarkdownRenderer content={mainTextLines.join('\n')} />
                                 {choiceLines.length > 0 && (() => {
-                                  const isMultipleChoice = /Choose all that apply|Select multiple|Select all/i.test(msg.text) ||
+                                  const isMultipleChoice = /Choose all that apply|Select all that apply|Select multiple|Choose multiple|Select all|Choose all|all that apply|any of these|additional symptoms/i.test(msg.text) ||
                                                            /ሁሉ(ንም)?.*?ይምረጡ/i.test(msg.text) ||
-                                                           choiceLines.some(line => /Choose all that apply|Select multiple|Select all/i.test(line));
+                                                           choiceLines.some(line => /Choose all that apply|Select all that apply|Select multiple|Choose multiple|Select all|Choose all|all that apply|any of these|additional symptoms/i.test(line));
                                   return (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px', width: '100%', maxWidth: '420px' }}>
                                       {choiceLines.map((choice, i) => {
@@ -3186,7 +3192,23 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                                   );
                                 })()}
                               </div>
-                            ) : msg.text
+                            ) : (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {msg.text && <span>{msg.text}</span>}
+                                {msg.attachment && (
+                                  <div style={{ marginTop: '6px', maxWidth: '300px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                                    {msg.attachment.type === 'image' ? (
+                                      <img src={msg.attachment.url} alt={msg.attachment.name || 'Image'} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', display: 'block' }} />
+                                    ) : (
+                                      <div style={{ background: 'var(--surface-hover)', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <FileText size={18} style={{ color: 'var(--accent)' }} />
+                                        <span style={{ fontSize: '13px', fontWeight: '500', color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{msg.attachment.name}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )
                           )}
                         </div>
                         {msg.hasError && (
@@ -3715,9 +3737,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                       )}
                       
                        {choiceLines.length > 0 && msg.role === 'ai' && (() => {
-                        const isMultipleChoice = /Choose all that apply|Select multiple|Select all/i.test(msg.text) ||
+                        const isMultipleChoice = /Choose all that apply|Select all that apply|Select multiple|Choose multiple|Select all|Choose all|all that apply|any of these|additional symptoms/i.test(msg.text) ||
                                                  /ሁሉ(ንም)?.*?ይምረጡ/i.test(msg.text) ||
-                                                 choiceLines.some(line => /Choose all that apply|Select multiple|Select all/i.test(line));
+                                                 choiceLines.some(line => /Choose all that apply|Select all that apply|Select multiple|Choose multiple|Select all|Choose all|all that apply|any of these|additional symptoms/i.test(line));
                         return (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
                             {choiceLines.map((choice, i) => {

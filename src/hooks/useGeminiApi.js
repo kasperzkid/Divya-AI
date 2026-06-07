@@ -272,13 +272,14 @@ Here is what I do:
           return;
         }
       }
-      setMessages(prev => [...prev, { id: Date.now() + 2, role: 'ai', text: aiResponse, translatedTo: appLanguage }]);
-      conversationHistoryRef.current.push({ role: 'ai', text: aiResponse });
-      saveNote(aiResponse);
+      const cleanAiResponse = aiResponse.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+      setMessages(prev => [...prev, { id: Date.now() + 2, role: 'ai', text: cleanAiResponse, translatedTo: appLanguage }]);
+      conversationHistoryRef.current.push({ role: 'ai', text: cleanAiResponse });
+      saveNote(cleanAiResponse);
       setIsThinking(false);
 
       if (isCallActiveRef.current) {
-        speak(stripMarkdownForSpeech(aiResponse));
+        speak(stripMarkdownForSpeech(cleanAiResponse));
       }
     } catch (err) {
       console.error('Gemini audio error:', err);
@@ -508,7 +509,7 @@ Here is what I do:
       const aiResponse = responseMatch ? responseMatch[1].trim() : rawText.trim();
 
       // Clean up duplicate/excessive vertical spacing (no more than 2 consecutive newlines)
-      const cleanAiResponse = aiResponse.replace(/\n{3,}/g, '\n\n').trim();
+      const cleanAiResponse = aiResponse.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
 
       setMessages(prev => [...prev, { id: Date.now() + 2, role: 'ai', text: cleanAiResponse, translatedTo: appLanguage }]);
       conversationHistoryRef.current.push({ role: 'ai', text: cleanAiResponse });

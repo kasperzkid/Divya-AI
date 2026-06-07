@@ -1540,6 +1540,7 @@ body.light-mode .message-row.user .bubble {
   border-radius: 4px 16px 16px 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(12px);
+  white-space: normal;
 }
 body.light-mode .message-row.ai .bubble {
   background: #ffffff;
@@ -1603,9 +1604,19 @@ body.light-mode .message-row.ai .bubble {
 }
 .message-row.ai .bubble li {
   margin-bottom: 4px;
+  white-space: pre-line;
 }
 .message-row.ai .bubble p {
   margin-bottom: 8px;
+  white-space: pre-line;
+}
+.message-row.ai .bubble h1,
+.message-row.ai .bubble h2,
+.message-row.ai .bubble h3,
+.message-row.ai .bubble h4,
+.message-row.ai .bubble h5,
+.message-row.ai .bubble h6 {
+  white-space: pre-line;
 }
 .message-row.ai .bubble p:last-child {
   margin-bottom: 0;
