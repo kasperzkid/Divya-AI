@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Noto+Serif+Ethiopic:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Ethiopic:wght@300;400;500;600;700;800&display=swap');
 
 :root {
   /* Refined Organic Dark Theme */
@@ -19,8 +19,8 @@
   --shadow-left:   20px 0 50px rgba(0,0,0,0.4);
   --shadow-right:  -20px 0 50px rgba(0,0,0,0.4);
   --sidebar-bg:    rgba(26, 28, 26, 0.85);
-  --font-heading:  'Cormorant Garamond', 'Noto Serif Ethiopic', serif;
-  --font-body:     'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading:  'Plus Jakarta Sans', 'Noto Sans Ethiopic', sans-serif;
+  --font-body:     'Inter', 'Noto Sans Ethiopic', sans-serif;
 }
 
 body.light-mode {
@@ -1637,7 +1637,7 @@ body.light-mode .message-row.ai .bubble {
 }
 /* Amharic text support in tables */
 .markdown-table {
-  font-family: var(--font-body), 'Noto Serif Ethiopic', serif;
+  font-family: var(--font-body);
 }
 
 /* Message action buttons (copy / translate) - shown below AI bubble */

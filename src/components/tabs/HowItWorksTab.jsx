@@ -11,7 +11,7 @@ export default function HowItWorksTab({ appLanguage }) {
 
   return (
     <div className="sample-page" style={{ padding: isMobile ? '16px' : '32px 40px', display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
-      <div style={{ width: '100%', maxWidth: '960px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      <div style={{ width: '100%', maxWidth: 'none', display: 'flex', flexDirection: 'column', gap: '32px' }}>
         <div>
           <h3 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '8px', color: 'var(--text)', fontFamily: 'var(--font-heading)' }}>
             {appLanguage === 'English' ? 'How It Works — Divya AI Guide' : 'እንዴት እንደሚሰራ — የዲቭያ AI መመሪያ'}

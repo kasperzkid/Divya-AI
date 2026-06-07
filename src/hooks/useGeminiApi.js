@@ -46,8 +46,10 @@ Today's date and time is: ${formattedToday}.
 When the user asks you to schedule or make an appointment (e.g. "after a week", "next Friday", "in 3 days"), you must calculate the exact date based on this reference and call the "schedule_routine_event" tool with the calculated ISO startTime and endTime strings. For example, if "after a week", you must schedule it for exactly 7 days from today.
 
 MAPS & PHARMACY CARDS INSTRUCTIONS:
-When the user asks you to show the nearest pharmacy, clinic, hospital, or medical facility, you MUST use the "search_nearby_clinics" tool. If they do not specify a location, assume it is "Addis Ababa" and call the tool immediately with query "pharmacy" or "hospital" accordingly.
-Once the tool returns the results, you MUST format your response exactly like this, keeping it short, highly concise, and extremely compact:
+When the user asks you to show the nearest pharmacy, clinic, hospital, or medical facility:
+- If the "search_nearby_clinics" tool is present in your available tools, you MUST call the tool immediately with the query "pharmacy" or "hospital" accordingly.
+- If the "search_nearby_clinics" tool is NOT present in your tools list (disabled), DO NOT output text saying you are calling the tool or attempting to execute it. Instead, notify the user that they can enable the Google Maps MCP service in App Settings for live lookups, but immediately provide a curated fallback list of top facilities in Addis Ababa (e.g. Bole Anbessa Pharmacy, Kenema Pharmacy, Zewditu Pharmacy, or Hayat General Hospital) in the required \`\`\`pharmacy-list\`\`\` JSON block anyway so the UI renders beautiful interactive cards for them!
+Once the tool returns the results (or if using the fallback block), you MUST format your response exactly like this, keeping it short, highly concise, and extremely compact:
 1. Put the \`\`\`pharmacy-list\`\`\` JSON block AT THE VERY TOP OF YOUR MESSAGE (before any other text or explanation).
 2. Show ONLY ONE single result in the \`\`\`pharmacy-list\`\`\` JSON array—specifically the closest/nearest one.
 3. The JSON object MUST contain the exact fields: "name", "address", "phone", "rating", "image", "directionsUrl", and "distance" (e.g., "1.2 km away (4 mins drive)" or "450 meters away").
@@ -505,7 +507,7 @@ Here is what I do:
       }
 
       const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      const responseMatch = rawText.match(/RESPONSE:\s*([\s\S]*?)$/i);
+      const responseMatch = rawText.includes("TRANSCRIPT:") ? rawText.match(/RESPONSE:\s*([\s\S]*?)$/i) : null;
       const aiResponse = responseMatch ? responseMatch[1].trim() : rawText.trim();
 
       // Clean up duplicate/excessive vertical spacing (no more than 2 consecutive newlines)
