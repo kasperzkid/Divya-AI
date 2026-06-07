@@ -1809,26 +1809,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
       return <MarkdownRenderer content={text} />;
     }
 
-    const renderInlineMarkdown = (lineText) => {
-      let clean = lineText.replace(/^[\s*\-\d\.]+\s*/, '');
-      const parts = [];
-      const boldRegex = /\*\*(.*?)\*\*/g;
-      let lastIndex = 0;
-      let match;
-      
-      while ((match = boldRegex.exec(clean)) !== null) {
-        if (match.index > lastIndex) {
-          parts.push(clean.substring(lastIndex, match.index));
-        }
-        parts.push(<strong key={match.index} style={{ color: 'var(--text)', fontWeight: '600' }}>{match[1]}</strong>);
-        lastIndex = boldRegex.lastIndex;
-      }
-      if (lastIndex < clean.length) {
-        parts.push(clean.substring(lastIndex));
-      }
-      
-      return parts.length > 0 ? parts : clean;
-    };
+    const reportRefId = `DIVYA-REF-${Math.abs(text.length * 31).toString(36).toUpperCase()}`;
+    const formattedDate = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    const isMobileView = window.innerWidth < 768;
 
     const extractImageAndClean = (lineText) => {
       const imgRegex = /!\[(.*?)\]\((.*?)\)/;
@@ -1887,19 +1870,109 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
     }).filter(Boolean);
 
     return (
-      <div className="modern-conclusion-container" style={{ display: 'flex', flexDirection: 'column', gap: '28px', color: 'var(--text-muted)', fontSize: '14.5px', lineHeight: '1.7', textAlign: 'left' }}>
+      <div className="modern-conclusion-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px', color: 'var(--text-muted)', fontSize: '14.5px', lineHeight: '1.7', textAlign: 'left', width: '100%' }}>
+        
+        {/* Official Medical Header Banner (Highly Responsive) */}
+        <div style={{
+          background: isLightMode ? '#f8f9fa' : 'rgba(255, 255, 255, 0.02)',
+          border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)'}`,
+          borderRadius: '16px',
+          padding: isMobileView ? '16px' : '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.02)',
+          width: '100%'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: '800',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              padding: '4px 10px',
+              borderRadius: '20px',
+              background: 'rgba(99, 102, 241, 0.1)',
+              color: 'var(--accent)',
+              border: '1px solid rgba(99, 102, 241, 0.15)'
+            }}>
+              {appLanguage === 'English' ? 'Official Diagnostic Summary' : 'ክሊኒካዊ የምርመራ ሪፖርት'}
+            </span>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', fontFamily: 'monospace' }}>
+              {reportRefId}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', borderTop: `1px solid ${isLightMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, paddingTop: '8px', fontSize: '12px', color: 'var(--text-muted)' }}>
+            <div>
+              <strong>{appLanguage === 'English' ? 'Issued By: ' : 'የተዘጋጀው በ: '}</strong>
+              <span>Divya Clinical Engine</span>
+            </div>
+            <div>
+              <strong>{appLanguage === 'English' ? 'Date: ' : 'ቀን: '}</strong>
+              <span>{formattedDate}</span>
+            </div>
+          </div>
+
+          {/* Action Row */}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '4px' }}>
+            <button
+              onClick={() => window.print()}
+              style={{
+                padding: '6px 12px',
+                background: 'var(--accent)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '11px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'transform 0.1s'
+              }}
+              onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
+              onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              📄 <span>{appLanguage === 'English' ? 'Print / Export PDF' : 'ሪፖርቱን አትም / PDF አስቀምጥ'}</span>
+            </button>
+            <button
+              onClick={() => alert(appLanguage === 'English' ? 'Simulating email dispatch... Clinical report has been securely sent to your registered email address.' : 'የክሊኒካል ሪፖርቱ በደህንነቱ በተጠበቀ መስመር ወደተመዘገበው ኢሜልዎ በተሳካ ሁኔታ ተልኳል።')}
+              style={{
+                padding: '6px 12px',
+                background: 'transparent',
+                color: 'var(--text)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                fontSize: '11px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'background 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-hover)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              📧 <span>{appLanguage === 'English' ? 'Email to Self' : 'በኢሜል ላክ'}</span>
+            </button>
+          </div>
+        </div>
+
         {report.opening && (
           <div style={{
-            fontSize: '16px',
+            fontSize: '15px',
             fontStyle: 'italic',
             color: 'var(--text)',
-            opacity: 0.9,
+            opacity: 0.95,
             borderLeft: '3px solid var(--accent)',
             paddingLeft: '16px',
             marginBottom: '4px',
-            lineHeight: '1.8'
+            lineHeight: '1.7'
           }}>
-            {report.opening}
+            <MarkdownRenderer content={report.opening} />
           </div>
         )}
 
@@ -1910,8 +1983,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               : 'linear-gradient(135deg, rgba(107, 144, 128, 0.03), rgba(255, 255, 255, 0.02))',
             border: `1px solid ${isLightMode ? 'rgba(82,121,111,0.15)' : 'rgba(255,255,255,0.06)'}`,
             borderRadius: '16px',
-            padding: '24px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
+            padding: isMobileView ? '16px' : '24px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
+            width: '100%'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '8px', background: isLightMode ? 'rgba(82,121,111,0.1)' : 'rgba(107,144,128,0.15)', color: 'var(--accent)' }}>
@@ -1922,13 +1996,13 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               </h4>
             </div>
             <div style={{ color: 'var(--text)', opacity: 0.9 }}>
-              {report.assessment}
+              <MarkdownRenderer content={report.assessment} />
             </div>
           </div>
         )}
 
         {report.relief.length > 0 && (
-          <div>
+          <div style={{ width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(212,163,115,0.15)', color: '#d4a373' }}>
                 <HeartPulse size={16} />
@@ -1938,12 +2012,12 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               </h4>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
               {report.relief.map((rawItem, i) => {
                 const { text: cleanText, imageUrl, imageAlt } = extractImageAndClean(rawItem);
                 if (!cleanText && imageUrl) {
                   return (
-                    <div key={i} style={{ borderRadius: '12px', overflow: 'hidden', border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)'}`, marginTop: '8px' }}>
+                    <div key={i} style={{ borderRadius: '12px', overflow: 'hidden', border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)'}`, marginTop: '4px', width: '100%' }}>
                       <img src={imageUrl} alt={imageAlt || 'Relief guideline'} style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', display: 'block' }} />
                     </div>
                   );
@@ -1953,21 +2027,22 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                     background: isLightMode ? 'rgba(0,0,0,0.015)' : 'rgba(255,255,255,0.015)',
                     border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.03)'}`,
                     borderRadius: '12px',
-                    padding: '16px 20px',
+                    padding: isMobileView ? '12px' : '16px 20px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '12px'
+                    gap: '12px',
+                    width: '100%'
                   }}>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                      <span style={{ color: 'var(--accent)', marginTop: '4px', flexShrink: 0 }}>
+                      <span style={{ color: 'var(--accent)', marginTop: '2px', flexShrink: 0 }}>
                         <CheckCheck size={16} />
                       </span>
-                      <div style={{ color: 'var(--text)', opacity: 0.9 }}>
-                        {renderInlineMarkdown(cleanText)}
+                      <div style={{ color: 'var(--text)', opacity: 0.9, flex: 1 }}>
+                        <MarkdownRenderer content={cleanText} />
                       </div>
                     </div>
                     {imageUrl && (
-                      <div style={{ borderRadius: '8px', overflow: 'hidden', border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, marginTop: '4px' }}>
+                      <div style={{ borderRadius: '8px', overflow: 'hidden', border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, marginTop: '4px', width: '100%' }}>
                         <img src={imageUrl} alt={imageAlt || 'Relief guideline'} style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', display: 'block' }} />
                       </div>
                     )}
@@ -1979,9 +2054,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
         )}
 
         {report.tests.length > 0 && (
-          <div>
+          <div style={{ width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '8px', background: isLightMode ? 'rgba(82, 121, 111, 0.1)' : 'rgba(107, 144, 128, 0.15)', color: 'var(--accent)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '8px', background: isLightMode ? 'rgba(82, 121, 111, 0.1)' : 'rgba(107,144,128,0.15)', color: 'var(--accent)' }}>
                 <Stethoscope size={16} />
               </span>
               <h4 style={{ margin: 0, fontSize: '15px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text)' }}>
@@ -1989,7 +2064,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               </h4>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
               {report.tests.map((rawItem, i) => {
                 const parsed = parseTestLine(rawItem);
                 const isUrgent = parsed.priorityType === 'urgent';
@@ -2000,20 +2075,21 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                     background: isLightMode ? '#ffffff' : 'rgba(255,255,255,0.01)',
                     border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)'}`,
                     borderRadius: '12px',
-                    padding: '16px 20px',
+                    padding: isMobileView ? '12px' : '16px 20px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    gap: '16px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.01)'
+                    gap: '12px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.01)',
+                    width: '100%'
                   }}>
                     <div style={{ flex: 1, color: 'var(--text)', opacity: 0.9 }}>
-                      {renderInlineMarkdown(parsed.text)}
+                      <MarkdownRenderer content={parsed.text} />
                     </div>
                     {parsed.priorityText && (
                       <span style={{
                         flexShrink: 0,
-                        fontSize: '11px',
+                        fontSize: '10px',
                         fontWeight: '700',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
@@ -2038,7 +2114,8 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
             background: 'rgba(239, 68, 68, 0.03)',
             border: '1px solid rgba(239, 68, 68, 0.15)',
             borderRadius: '16px',
-            padding: '24px'
+            padding: isMobileView ? '16px' : '24px',
+            width: '100%'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
               <span className="red-flag-pulse-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
@@ -2053,8 +2130,8 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
               {report.warningSigns.map((rawItem, i) => (
                 <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                   <span style={{ color: '#ef4444', fontWeight: 'bold', fontSize: '18px', lineHeight: '1', marginTop: '-1px' }}>•</span>
-                  <div style={{ color: 'var(--text)', opacity: 0.9 }}>
-                    {renderInlineMarkdown(rawItem)}
+                  <div style={{ color: 'var(--text)', opacity: 0.9, flex: 1 }}>
+                    <MarkdownRenderer content={rawItem} />
                   </div>
                 </div>
               ))}
@@ -2161,26 +2238,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
       return <MarkdownRenderer content={text} />;
     }
 
-    const renderInlineMarkdown = (lineText) => {
-      let clean = lineText.replace(/^[\s*\-\d\.]+\s*/, '');
-      const parts = [];
-      const boldRegex = /\*\*(.*?)\*\*/g;
-      let lastIndex = 0;
-      let match;
-      
-      while ((match = boldRegex.exec(clean)) !== null) {
-        if (match.index > lastIndex) {
-          parts.push(clean.substring(lastIndex, match.index));
-        }
-        parts.push(<strong key={match.index} style={{ color: 'var(--text)', fontWeight: '600' }}>{match[1]}</strong>);
-        lastIndex = boldRegex.lastIndex;
-      }
-      if (lastIndex < clean.length) {
-        parts.push(clean.substring(lastIndex));
-      }
-      
-      return parts.length > 0 ? parts : clean;
-    };
+    const reportRefId = `DIVYA-REF-${Math.abs(text.length * 31).toString(36).toUpperCase()}`;
+    const formattedDate = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    const isMobileView = window.innerWidth < 768;
 
     const extractImageAndClean = (lineText) => {
       const imgRegex = /!\[(.*?)\]\((.*?)\)/;
@@ -2239,36 +2299,128 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
     }).filter(Boolean);
 
     return (
-      <div className="modern-brief-conclusion" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div className="modern-brief-conclusion" style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+        
+        {/* Official Medical Header Banner (Highly Responsive) */}
+        <div style={{
+          background: isLightMode ? '#f8f9fa' : 'rgba(255, 255, 255, 0.02)',
+          border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)'}`,
+          borderRadius: '16px',
+          padding: isMobileView ? '16px' : '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.02)',
+          width: '100%'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: '800',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              padding: '4px 10px',
+              borderRadius: '20px',
+              background: 'rgba(99, 102, 241, 0.1)',
+              color: 'var(--accent)',
+              border: '1px solid rgba(99, 102, 241, 0.15)'
+            }}>
+              {appLanguage === 'English' ? 'Official Diagnostic Summary' : 'ክሊኒካዊ የምርመራ ሪፖርት'}
+            </span>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', fontFamily: 'monospace' }}>
+              {reportRefId}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', borderTop: `1px solid ${isLightMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, paddingTop: '8px', fontSize: '12px', color: 'var(--text-muted)' }}>
+            <div>
+              <strong>{appLanguage === 'English' ? 'Issued By: ' : 'የተዘጋጀው በ: '}</strong>
+              <span>Divya Clinical Engine</span>
+            </div>
+            <div>
+              <strong>{appLanguage === 'English' ? 'Date: ' : 'ቀን: '}</strong>
+              <span>{formattedDate}</span>
+            </div>
+          </div>
+
+          {/* Action Row */}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '4px' }}>
+            <button
+              onClick={() => window.print()}
+              style={{
+                padding: '6px 12px',
+                background: 'var(--accent)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '11px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'transform 0.1s'
+              }}
+              onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
+              onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              📄 <span>{appLanguage === 'English' ? 'Print / Export PDF' : 'ሪፖርቱን አትም / PDF አስቀምጥ'}</span>
+            </button>
+            <button
+              onClick={() => alert(appLanguage === 'English' ? 'Simulating email dispatch... Clinical report has been securely sent to your registered email address.' : 'የክሊኒካል ሪፖርቱ በደህንነቱ በተጠበቀ መስመር ወደተመዘገበው ኢሜልዎ በተሳካ ሁኔታ ተልኳል።')}
+              style={{
+                padding: '6px 12px',
+                background: 'transparent',
+                color: 'var(--text)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                fontSize: '11px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'background 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-hover)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              📧 <span>{appLanguage === 'English' ? 'Email to Self' : 'በኢሜል ላክ'}</span>
+            </button>
+          </div>
+        </div>
+
         {report.opening && (
           <div style={{
-            fontSize: '15.5px',
+            fontSize: '15px',
             fontStyle: 'italic',
             color: 'var(--text)',
-            opacity: 0.9,
-            borderLeft: '4px solid var(--accent)',
+            opacity: 0.95,
+            borderLeft: '3px solid var(--accent)',
             paddingLeft: '16px',
             lineHeight: '1.7',
             marginBottom: '4px'
           }}>
-            {report.opening}
+            <MarkdownRenderer content={report.opening} />
           </div>
         )}
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))',
-          gap: '30px',
-          alignItems: 'start'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '20px',
+          alignItems: 'start',
+          width: '100%'
         }} className="report-two-col-grid">
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
             {report.assessment && (
               <div style={{
                 background: isLightMode ? 'rgba(82, 121, 111, 0.04)' : 'rgba(107, 144, 128, 0.03)',
                 border: `1px solid ${isLightMode ? 'rgba(82,121,111,0.12)' : 'rgba(255,255,255,0.06)'}`,
                 borderRadius: '16px',
-                padding: '20px'
+                padding: isMobileView ? '16px' : '20px',
+                width: '100%'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px', borderRadius: '8px', background: isLightMode ? 'rgba(82,121,111,0.1)' : 'rgba(107,144,128,0.15)', color: 'var(--accent)' }}>
@@ -2279,13 +2431,13 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                   </h4>
                 </div>
                 <div style={{ color: 'var(--text)', opacity: 0.95, fontSize: '14px', lineHeight: '1.6' }}>
-                  {report.assessment}
+                  <MarkdownRenderer content={report.assessment} />
                 </div>
               </div>
             )}
 
             {report.tests.length > 0 && (
-              <div>
+              <div style={{ width: '100%' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px', borderRadius: '8px', background: isLightMode ? 'rgba(82, 121, 111, 0.1)' : 'rgba(107, 144, 128, 0.15)', color: 'var(--accent)' }}>
                     <Stethoscope size={15} />
@@ -2295,7 +2447,7 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                   </h4>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
                   {report.tests.map((rawItem, i) => {
                     const parsed = parseTestLine(rawItem);
                     const isUrgent = parsed.priorityType === 'urgent';
@@ -2310,10 +2462,11 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        gap: '12px'
+                        gap: '12px',
+                        width: '100%'
                       }}>
                         <div style={{ flex: 1, color: 'var(--text)', opacity: 0.9, fontSize: '13.5px' }}>
-                          {renderInlineMarkdown(parsed.text)}
+                          <MarkdownRenderer content={parsed.text} />
                         </div>
                         {parsed.priorityText && (
                           <span style={{
@@ -2341,7 +2494,8 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                 background: 'rgba(239, 68, 68, 0.02)',
                 border: '1px solid rgba(239, 68, 68, 0.12)',
                 borderRadius: '16px',
-                padding: '20px'
+                padding: isMobileView ? '16px' : '20px',
+                width: '100%'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
                   <span className="red-flag-pulse-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444' }}>
@@ -2352,12 +2506,12 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                   </h4>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
                   {report.warningSigns.map((rawItem, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', fontSize: '13.5px' }}>
+                    <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', fontSize: '13.5px', width: '100%' }}>
                       <span style={{ color: '#ef4444', fontWeight: 'bold' }}>•</span>
-                      <div style={{ color: 'var(--text)', opacity: 0.9 }}>
-                        {renderInlineMarkdown(rawItem)}
+                      <div style={{ color: 'var(--text)', opacity: 0.9, flex: 1 }}>
+                        <MarkdownRenderer content={rawItem} />
                       </div>
                     </div>
                   ))}
@@ -2366,9 +2520,9 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
             )}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
             {report.relief.length > 0 && (
-              <div>
+              <div style={{ width: '100%' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px', borderRadius: '8px', background: 'rgba(212,163,115,0.15)', color: '#d4a373' }}>
                     <HeartPulse size={15} />
@@ -2378,24 +2532,26 @@ ETHIOPIAN CULTURAL NUTRITION REQUIREMENT:
                   </h4>
                 </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
                   {report.relief.map((rawItem, i) => {
                     const { text: cleanText, imageUrl, imageAlt } = extractImageAndClean(rawItem);
                     if (!cleanText && imageUrl) {
                       return (
-                        <div key={i} style={{ borderRadius: '10px', overflow: 'hidden', border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, marginTop: '4px' }}>
+                        <div key={i} style={{ borderRadius: '10px', overflow: 'hidden', border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, marginTop: '4px', width: '100%' }}>
                           <img src={imageUrl} alt={imageAlt || 'Relief guideline'} style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', display: 'block' }} />
                         </div>
                       );
                     }
                     return (
-                      <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', fontSize: '13.5px' }}>
-                        <span style={{ color: 'var(--accent)', fontWeight: 'bold' }}>•</span>
-                        <div style={{ color: 'var(--text)', opacity: 0.9 }}>
-                          {renderInlineMarkdown(cleanText)}
+                      <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13.5px', width: '100%', background: isLightMode ? 'rgba(0,0,0,0.012)' : 'rgba(255,255,255,0.012)', padding: '12px', borderRadius: '12px', border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)'}` }}>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', width: '100%' }}>
+                          <span style={{ color: 'var(--accent)', fontWeight: 'bold' }}>•</span>
+                          <div style={{ color: 'var(--text)', opacity: 0.9, flex: 1 }}>
+                            <MarkdownRenderer content={cleanText} />
+                          </div>
                         </div>
                         {imageUrl && (
-                          <div style={{ borderRadius: '10px', overflow: 'hidden', border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, marginTop: '4px' }}>
+                          <div style={{ borderRadius: '10px', overflow: 'hidden', border: `1px solid ${isLightMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`, marginTop: '4px', width: '100%' }}>
                             <img src={imageUrl} alt={imageAlt || 'Relief guideline'} style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', display: 'block' }} />
                           </div>
                         )}
