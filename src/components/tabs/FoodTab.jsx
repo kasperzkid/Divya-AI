@@ -17,7 +17,7 @@ const MEALS_POOL = [
     macros: { carbs: "52g", protein: "10g", fat: "12g" },
     microsTags: ["Iron (Fe)", "Zinc (Zn)", "Vitamin B6", "Folate"],
     description: "Shredded wheat flatbread tossed gently with warm spiced clarified butter (niter kibbeh) and berbere spice, drizzled with pure organic honey.",
-    img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=200"
+    img: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&q=80&w=300"
   },
   {
     id: 'breakfast_oatmeal',
@@ -28,7 +28,7 @@ const MEALS_POOL = [
     macros: { carbs: "48g", protein: "9g", fat: "8g" },
     microsTags: ["Magnesium", "Vitamin B6", "Potassium", "Omega-3"],
     description: "Warm rolled oats simmered with flaxseed for omega-3s, topped with fresh banana slices and organic honey.",
-    img: "https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&q=80&w=200"
+    img: "https://images.unsplash.com/photo-1517686469429-8bdb88b9f907?auto=format&fit=crop&q=80&w=300"
   },
   {
     id: 'lunch_shiro',
@@ -39,7 +39,7 @@ const MEALS_POOL = [
     macros: { carbs: "65g", protein: "15g", fat: "12g" },
     microsTags: ["Iron (Fe)", "Zinc (Zn)", "Vitamin A", "Calcium"],
     description: "Traditional iron-rich teff injera paired with spiced chickpea flour stew and steamed collard greens.",
-    img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=200"
+    img: "https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&q=80&w=300"
   },
   {
     id: 'lunch_kik',
@@ -50,7 +50,7 @@ const MEALS_POOL = [
     macros: { carbs: "58g", protein: "14g", fat: "8g" },
     microsTags: ["Folate", "Fiber", "Potassium", "Iron (Fe)"],
     description: "Mild, turmeric-infused yellow split pea stew simmered with onions, garlic, and ginger, served with soft teff injera.",
-    img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=200"
+    img: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&q=80&w=300"
   },
   {
     id: 'afternoon_snack',
@@ -61,7 +61,7 @@ const MEALS_POOL = [
     macros: { carbs: "28g", protein: "4g", fat: "6g" },
     microsTags: ["Copper", "Fiber", "Manganese"],
     description: "Traditional late-afternoon roasted barley and peanut snack served with spiced herbal tea or Buna.",
-    img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=200"
+    img: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?auto=format&fit=crop&q=80&w=300"
   },
   {
     id: 'dinner_misir',
@@ -72,7 +72,7 @@ const MEALS_POOL = [
     macros: { carbs: "55g", protein: "18g", fat: "9g" },
     microsTags: ["Folate", "Iron (Fe)", "Vitamin C", "Zinc"],
     description: "A protein-rich red lentil stew simmered with anti-inflammatory berbere spices, served with fresh tomato salad.",
-    img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=200"
+    img: "https://images.unsplash.com/photo-1547825407-2d060104b7c8?auto=format&fit=crop&q=80&w=300"
   },
   {
     id: 'dinner_gomen',
@@ -83,7 +83,7 @@ const MEALS_POOL = [
     macros: { carbs: "42g", protein: "8g", fat: "10g" },
     microsTags: ["Vitamin C", "Vitamin A", "Calcium", "Potassium"],
     description: "Slow-simmered collard greens with garlic and ginger, paired with a vibrant beetroot side salad.",
-    img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=200"
+    img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=300"
   }
 ];
 
@@ -652,7 +652,7 @@ export default function FoodTab({ masterReport, isLightMode, appLanguage, setHas
           macros: m.macros || { carbs: '45g', protein: '15g', fat: '10g' },
           microsTags: m.microsTags || [],
           description: m.description || 'Nutritious balanced option suggested by Divya.',
-          img: m.img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=200',
+          img: m.img || 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&q=80&w=300',
           status: calculateMealStatus(m.id || 'lunch'),
           checked: false,
           whatAteInstead: ''
